@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+
+# Environment
+.env
+
+# OS
+.DS_Store
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# WeChat CDN tool state/cache
+packages/.wechat-cdn-cache.json
+packages/.wechat-cdn-state.json
