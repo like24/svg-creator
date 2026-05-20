@@ -20,6 +20,9 @@ packages/                       工具包
   └── wechat-svg-cdn/           图片上传与草稿管理
 .claude/skills/                 Claude Code 技能
   └── fetch-svg/                文章抓取
+  └── wechat-svg-authoring/     公众号 SVG 动画生成与案例学习
+.codex/skills/                  Codex 技能
+  └── wechat-svg-authoring/     公众号 SVG 动画生成与案例学习
 ```
 
 ## 工具
@@ -63,9 +66,72 @@ cp .env.example .env  # 填入 WECHAT_APP_ID 和 WECHAT_APP_SECRET
 
 `source/notes/` 下包含：
 
-- `svg-animation-knowledge.md` — 微信 SVG 动画完整参考（动画属性、容器结构、18 种动画模式、排错清单）
-- `svg-animation-guide.md` — 学习指南
-- `1.txt ~ 30.txt` — 学习笔记
+- `svg-authoring-spec.md` — 公众号 SVG 动画开发规范与模式库
+- `svg-case-index.md` — 全量案例索引，按布局/交互/技术点归类
+- `svg-case-evidence.md` — 全量案例复读证据表
+- `svg-layout-patterns.md` — SVG 布局与排版模式笔记
+
+## 使用 Skill
+
+本项目已内置 `wechat-svg-authoring` skill，Claude Code 和 Codex 都可以使用：
+
+```text
+.claude/skills/wechat-svg-authoring/
+.codex/skills/wechat-svg-authoring/
+```
+
+这个 skill 用于两类任务：
+
+- 生成或修改公众号 SVG 动画
+- 学习新增案例并更新规则库
+
+### 生成 SVG 动画
+
+在 Claude Code 或 Codex 中直接说明使用 skill：
+
+```text
+使用 wechat-svg-authoring skill，帮我实现一个公众号 SVG 动画。
+
+需求：
+- 图片尺寸：750x1334
+- 图片：./images/cover.png、./images/result.png
+- 效果：点击 cover 后切换到 result
+- 输出：开发阶段 HTML，图片保持本地路径
+```
+
+核心规则：
+
+- 不使用 JS
+- 不使用外链 CSS
+- 使用内联 HTML/SVG/SMIL
+- `viewBox` 跟随实际 UI 图尺寸
+- 开发阶段图片使用本地相对路径
+- 上线前通过 `packages/wechat-svg-cdn` 批量上传并替换 CDN
+
+### 学习新增案例
+
+新增 `source/*.html` 后，让 agent 按固定流程更新知识库：
+
+```text
+使用 wechat-svg-authoring skill，学习 source 里新增的公众号 SVG 案例。
+请先更新 source/notes/svg-case-evidence.md，再更新 svg-case-index.md。
+如果发现新的可复用规则，再更新 svg-authoring-spec.md。
+最后同步 .codex 和 .claude skill references。
+```
+
+更新顺序必须是：
+
+```text
+案例证据表 → 案例索引 → 开发规范 → skill references
+```
+
+辅助脚本：
+
+```bash
+node .codex/skills/wechat-svg-authoring/scripts/extract-case-evidence.js source
+```
+
+该脚本会提取每个案例的标签、触发事件、动画属性、viewBox、横滑/触摸/序列帧等证据，供更新 `svg-case-evidence.md` 使用。
 
 ## 环境要求
 
