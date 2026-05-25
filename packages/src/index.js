@@ -46,7 +46,7 @@ async function run(files, options = {}) {
 
   // 收集所有图片引用，跨文件去重
   const allImagePaths = new Set();    // 绝对路径集合
-  const pathToLocal = new Map();      // 绝对路径 -> 原始相对路径
+  const filePathToAbs = new Map();    // 文件路径 -> 原始相对路径 -> 绝对路径
   const fileRefs = new Map();         // 文件路径 -> refs[]
 
   for (const file of files) {
@@ -67,11 +67,13 @@ async function run(files, options = {}) {
 
     log.info(`${file} 中找到 ${refs.length} 个本地图片引用`);
     fileRefs.set(absFile, refs);
+    const localToAbs = new Map();
+    filePathToAbs.set(absFile, localToAbs);
 
     for (const ref of refs) {
       const absImagePath = resolveImagePath(absFile, ref.localPath);
       allImagePaths.add(absImagePath);
-      pathToLocal.set(absImagePath, ref.localPath);
+      localToAbs.set(ref.localPath, absImagePath);
     }
   }
 
@@ -116,9 +118,10 @@ async function run(files, options = {}) {
   }
 
   // 上传图片（并发 + 缓存）
-  const tokenManager = new TokenManager(appId, appSecret);
+  const cacheDir = options.cacheDir || path.join(__dirname, '..');
+  const tokenManager = new TokenManager(appId, appSecret, { cacheDir });
   const uploader = new Uploader(tokenManager, { permanent });
-  const cache = new UploadCache(process.cwd());
+  const cache = new UploadCache(cacheDir);
 
   const imageArray = Array.from(allImagePaths);
 
@@ -127,7 +130,7 @@ async function run(files, options = {}) {
   const toUpload = [];
   for (const absPath of imageArray) {
     if (!noCache) {
-      const cached = cache.get(absPath);
+      const cached = cache.get(absPath, permanent);
       if (cached) {
         cachedResults.set(absPath, cached);
         continue;
@@ -173,35 +176,52 @@ async function run(files, options = {}) {
       spinner.succeed(`全部上传成功: ${uploadResults.size} 个图片`);
     }
 
-    // 写入缓存
-    for (const [absPath, result] of uploadResults) {
-      cache.set(absPath, result.url, result.mediaId);
-    }
+    cache.setMany(
+      Array.from(uploadResults, ([absPath, result]) => ({
+        filePath: absPath,
+        cdnUrl: result.url,
+        mediaId: result.mediaId,
+        permanent,
+      }))
+    );
+  }
+
+  if (uploadErrors.length > 0) {
+    const err = new Error(`有 ${uploadErrors.length} 个图片上传失败，已停止生成输出文件`);
+    err.uploadErrors = uploadErrors;
+    throw err;
   }
 
   // 合并缓存和新上传的结果
   const allResults = new Map([...cachedResults, ...uploadResults]);
 
-  // 构建替换映射: localPath -> cdnUrl
-  const pathMap = new Map();
-  for (const [absPath, result] of allResults) {
-    const localPath = pathToLocal.get(absPath);
-    pathMap.set(localPath, result.url);
-  }
-
   // 替换并生成新文件
   const outputFiles = [];
   let returnContentResult = null;
+  let returnThumbMediaId = null;
 
   for (const [absFile, refs] of fileRefs) {
     if (refs.length === 0) continue;
+
+    const localToAbs = filePathToAbs.get(absFile) || new Map();
+    const pathMap = new Map();
+    for (const ref of refs) {
+      const absPath = localToAbs.get(ref.localPath);
+      const result = allResults.get(absPath);
+      if (result) {
+        pathMap.set(ref.localPath, result.url);
+        if (!returnThumbMediaId && result.mediaId) {
+          returnThumbMediaId = result.mediaId;
+        }
+      }
+    }
 
     const content = fs.readFileSync(absFile, 'utf-8');
     const newContent = replacePaths(content, pathMap);
 
     // returnContent 模式：只返回内容，不写文件
     if (options.returnContent) {
-      returnContentResult = { content: newContent };
+      returnContentResult = { content: newContent, thumbMediaId: returnThumbMediaId };
       continue;
     }
 
@@ -251,7 +271,7 @@ async function run(files, options = {}) {
 
   console.log(chalk.cyan('\n--- 图片链接 ---'));
   for (const [absPath, result] of allResults) {
-    const localPath = pathToLocal.get(absPath);
+    const localPath = path.relative(process.cwd(), absPath);
     const fromCache = cachedResults.has(absPath) ? chalk.gray(' [缓存]') : '';
     console.log(`  ${localPath} -> ${chalk.blue(result.url)}${fromCache}`);
   }

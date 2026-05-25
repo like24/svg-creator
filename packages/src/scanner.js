@@ -2,15 +2,15 @@ const path = require('path');
 
 // CSS url() — 匹配 background / background-image: url(...)
 // 支持三种写法：url(&quot;path&quot;) / url("path") / url(path)
-// 排除 http/https URL
+// 排除 http/https、协议相对 URL 和 data URI
 const CSS_URL_RE =
-  /background(?:-image)?:\s*url\(\s*(?:&quot;|")?((?!(?:https?:)?\/\/)[^"')&]+)(?:&quot;|")?\s*\)/gi;
+  /background(?:-image)?:\s*url\(\s*(?:&quot;|")?((?!(?:(?:https?:)?\/\/|data:))[^"')&]+)(?:&quot;|")?\s*\)/gi;
 
 // <image href="...">
-const SVG_IMAGE_RE = /<image[^>]+href="((?!(?:https?:)?\/\/)[^"]+)"/gi;
+const SVG_IMAGE_RE = /<image[^>]+href="((?!(?:(?:https?:)?\/\/|data:))[^"]+)"/gi;
 
 // <img src="...">
-const HTML_IMG_RE = /<img[^>]+src="((?!(?:https?:)?\/\/)[^"]+)"/gi;
+const HTML_IMG_RE = /<img[^>]+src="((?!(?:(?:https?:)?\/\/|data:))[^"]+)"/gi;
 
 function scanFile(htmlContent) {
   const refs = [];

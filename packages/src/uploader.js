@@ -10,6 +10,24 @@ const MAX_SIZE_PERMANENT = 10 * 1024 * 1024;  // 10MB
 const MAX_SIZE_TEMPORARY = 2 * 1024 * 1024;   // 2MB
 
 const SUPPORTED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
+const TOKEN_ERROR_CODES = new Set([40001, 42001]);
+const RETRYABLE_ERROR_CODES = new Set([40001, 42001, 45009, 45011, 45047, -1]);
+const MAX_ATTEMPTS = 3;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function parseWechatErrorCode(message) {
+  const match = message.match(/\[(-?\d+)\]/);
+  return match ? Number(match[1]) : null;
+}
+
+function isRetryableError(err) {
+  const code = parseWechatErrorCode(err.message);
+  if (code !== null) return RETRYABLE_ERROR_CODES.has(code);
+  return Boolean(err.code || err.response?.status >= 500);
+}
 
 class Uploader {
   constructor(tokenManager, options = {}) {
@@ -47,10 +65,14 @@ class Uploader {
     const data = res.data;
     if (data.errcode) {
       // token 过期，清除缓存后抛出让调用方重试
-      if (data.errcode === 40001 || data.errcode === 42001) {
+      if (TOKEN_ERROR_CODES.has(data.errcode)) {
         this.tokenManager.clearToken();
       }
       throw new Error(`上传失败: [${data.errcode}] ${data.errmsg} (${absPath})`);
+    }
+
+    if (!data.url) {
+      throw new Error(`上传成功但未返回可替换的图片 URL，请使用永久素材模式: ${absPath}`);
     }
 
     // WeChat API 返回的 URL 默认是 http://，转为 https://
@@ -68,7 +90,7 @@ class Uploader {
 
     const uploadOne = async (absPath) => {
       let lastErr;
-      for (let attempt = 0; attempt < 2; attempt++) {
+      for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
         try {
           const result = await this.uploadImage(absPath);
           results.set(absPath, result);
@@ -78,7 +100,8 @@ class Uploader {
           break;
         } catch (err) {
           lastErr = err;
-          if (err.message.includes('[40001]') || err.message.includes('[42001]')) {
+          if (attempt < MAX_ATTEMPTS - 1 && isRetryableError(err)) {
+            await sleep(500 * (attempt + 1));
             continue;
           }
           break;

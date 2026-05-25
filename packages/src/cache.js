@@ -31,16 +31,29 @@ class UploadCache {
     return crypto.createHash('md5').update(content).digest('hex');
   }
 
+  // 生成缓存 key（包含素材类型）
+  static getCacheKey(filePath, permanent = true) {
+    const fileHash = UploadCache.fileHash(filePath);
+    return `${permanent ? 'perm_' : 'temp_'}${fileHash}`;
+  }
+
   // 查询缓存：文件 hash 是否已上传过
-  get(filePath) {
-    const hash = UploadCache.fileHash(filePath);
-    return this.data[hash] || null;
+  get(filePath, permanent = true) {
+    const key = UploadCache.getCacheKey(filePath, permanent);
+    return this.data[key] || null;
   }
 
   // 写入缓存
-  set(filePath, cdnUrl, mediaId) {
-    const hash = UploadCache.fileHash(filePath);
-    this.data[hash] = { url: cdnUrl, mediaId, file: path.basename(filePath), time: Date.now() };
+  set(filePath, cdnUrl, mediaId, { save = true, permanent = true } = {}) {
+    const key = UploadCache.getCacheKey(filePath, permanent);
+    this.data[key] = { url: cdnUrl, mediaId, file: path.basename(filePath), time: Date.now(), permanent };
+    if (save) this._save();
+  }
+
+  setMany(entries) {
+    for (const { filePath, cdnUrl, mediaId, permanent = true } of entries) {
+      this.set(filePath, cdnUrl, mediaId, { save: false, permanent });
+    }
     this._save();
   }
 

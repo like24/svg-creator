@@ -8,11 +8,10 @@ const readline = require('readline');
 const { run } = require('../src/index');
 const TokenManager = require('../src/token-manager');
 const WechatAPI = require('../src/wechat-api');
-const UploadCache = require('../src/cache');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
-const STATE_FILE = '.wechat-cdn-state.json';
+const STATE_FILE = path.join(__dirname, '..', '.wechat-cdn-state.json');
 
 function ask(question) {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -32,6 +31,33 @@ async function askMaterialType() {
   return answer !== '2';
 }
 
+async function resolveMaterialType(opts, { allowTemporary = true } = {}) {
+  const rootOpts = program.opts();
+  const permanentOpt = Boolean(opts.permanent || rootOpts.permanent);
+  const temporaryOpt = Boolean(opts.temporary || rootOpts.temporary);
+
+  if (permanentOpt && temporaryOpt) {
+    console.error('不能同时指定 --permanent 和 --temporary');
+    process.exit(1);
+  }
+  if (temporaryOpt) {
+    if (!allowTemporary) {
+      console.error('当前命令需要可替换进 HTML 的图片 URL，请使用 --permanent');
+      process.exit(1);
+    }
+    return false;
+  }
+  if (permanentOpt) {
+    return true;
+  }
+  const permanent = await askMaterialType();
+  if (!permanent && !allowTemporary) {
+    console.error('当前命令需要可替换进 HTML 的图片 URL，请使用永久素材模式');
+    process.exit(1);
+  }
+  return permanent;
+}
+
 function getCredentials(opts) {
   const appId = opts.appid || process.env.WECHAT_APP_ID;
   const appSecret = opts.secret || process.env.WECHAT_APP_SECRET;
@@ -44,13 +70,13 @@ function getCredentials(opts) {
 
 function createAPI(opts) {
   const { appId, appSecret } = getCredentials(opts);
-  const tokenManager = new TokenManager(appId, appSecret);
+  const tokenManager = new TokenManager(appId, appSecret, { cacheDir: path.join(__dirname, '..') });
   return new WechatAPI(tokenManager);
 }
 
 // 读取/保存当前草稿状态
 function loadState() {
-  const statePath = path.join(process.cwd(), STATE_FILE);
+  const statePath = STATE_FILE;
   try {
     if (fs.existsSync(statePath)) {
       return JSON.parse(fs.readFileSync(statePath, 'utf-8'));
@@ -60,7 +86,7 @@ function loadState() {
 }
 
 function saveState(data) {
-  const statePath = path.join(process.cwd(), STATE_FILE);
+  const statePath = STATE_FILE;
   const state = { ...loadState(), ...data, updated: Date.now() };
   fs.writeFileSync(statePath, JSON.stringify(state, null, 2), 'utf-8');
 }
@@ -69,13 +95,14 @@ function addCommonOptions(cmd) {
   return cmd
     .option('--appid <id>', '微信 AppID（覆盖 .env 配置）')
     .option('--secret <secret>', '微信 AppSecret（覆盖 .env 配置）')
+    .option('--permanent', '使用永久素材，跳过交互选择')
+    .option('--temporary', '使用临时素材，跳过交互选择')
     .option('-v, --verbose', '详细输出');
 }
 
 // 上传图片并返回替换后的内容和第一个图片的 media_id（用作封面）
-async function uploadAndReplace(file, opts) {
+async function uploadAndReplace(file, opts, permanent) {
   const { appId, appSecret } = getCredentials(opts);
-  const permanent = await askMaterialType();
 
   const result = await run([file], {
     appId,
@@ -93,6 +120,9 @@ async function uploadAndReplace(file, opts) {
     content = result.content;
   }
 
+  // 给所有 section 标签添加 powered-by 属性
+  content = content.replace(/<section/g, '<section powered-by="Wechat:YLYINLU"');
+
   // 模板插入
   if (opts.template) {
     const tplPath = path.resolve(opts.template);
@@ -104,18 +134,24 @@ async function uploadAndReplace(file, opts) {
     content = template.replace('{{content}}', content);
   }
 
-  // 从缓存中取第一个图片的 media_id 作为默认封面
-  const cache = new UploadCache(process.cwd());
-  const cached = cache.getAll();
-  const firstMediaId = cached.length > 0 ? cached[0].mediaId : null;
+  return { content, thumbMediaId: result ? result.thumbMediaId : null };
+}
 
-  return { content, thumbMediaId: firstMediaId };
+// 从 HTML 文件中提取 title 标签内容
+function extractTitle(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const match = content.match(/<title[^>]*>([^<]*)<\/title>/i);
+    return match ? match[1].trim() : null;
+  } catch {
+    return null;
+  }
 }
 
 // 创建或更新草稿
 async function createOrUpdateDraft(api, { file, content, title, author, digest, thumb, mediaId }) {
   const absFile = path.resolve(file);
-  const draftTitle = title || path.basename(absFile, path.extname(absFile));
+  const draftTitle = title || extractTitle(absFile) || path.basename(absFile, path.extname(absFile));
 
   if (mediaId) {
     try {
@@ -145,12 +181,16 @@ async function createOrUpdateDraft(api, { file, content, title, author, digest, 
 const program = new Command();
 
 program
-  .name('wechat-svg-cdn')
+  .name('wechat-svg')
   .description('微信公众号 SVG 图片上传与文章管理工具')
   .version('1.0.0');
 
-// ========== 默认命令：上传图片 ==========
-program
+// ========== upload：只上传图片（保留原功能）==========
+const uploadCmd = program
+  .command('upload')
+  .description('上传图片并替换路径（只上传，不创建草稿）');
+
+uploadCmd
   .argument('[files...]', 'HTML 文件路径（支持多个文件）')
   .option('-o, --output <dir>', '输出目录（默认与输入文件同目录）')
   .option('--suffix <suffix>', '输出文件后缀', '-cdn')
@@ -160,10 +200,12 @@ program
   .option('--no-open', '不自动打开生成的文件')
   .option('--appid <id>', '微信 AppID（覆盖 .env 配置）')
   .option('--secret <secret>', '微信 AppSecret（覆盖 .env 配置）')
+  .option('--permanent', '使用永久素材，跳过交互选择')
+  .option('--temporary', '使用临时素材，跳过交互选择')
   .option('-v, --verbose', '详细输出')
   .action(async (files, opts) => {
     if (opts.cleanCache) {
-      const cachePath = path.join(process.cwd(), '.wechat-cdn-cache.json');
+      const cachePath = path.join(__dirname, '..', '.wechat-cdn-cache.json');
       if (fs.existsSync(cachePath)) {
         fs.unlinkSync(cachePath);
         console.log('缓存已清理');
@@ -174,32 +216,38 @@ program
     }
 
     if (!files || files.length === 0) {
-      program.help();
+      uploadCmd.help();
       return;
     }
 
-    const { appId, appSecret } = getCredentials(opts);
-    const permanent = opts.dryRun ? true : await askMaterialType();
+    const permanent = opts.dryRun ? true : await resolveMaterialType(opts, { allowTemporary: false });
+    const { appId, appSecret } = opts.dryRun ? { appId: null, appSecret: null } : getCredentials(opts);
 
-    await run(files, {
-      appId,
-      appSecret,
-      permanent,
-      outputDir: opts.output ? path.resolve(opts.output) : undefined,
-      suffix: opts.suffix,
-      dryRun: opts.dryRun,
-      verbose: opts.verbose,
-      noCache: opts.cache === false,
-      noOpen: opts.open === false,
-    });
+    try {
+      await run(files, {
+        appId,
+        appSecret,
+        permanent,
+        outputDir: opts.output ? path.resolve(opts.output) : undefined,
+        suffix: opts.suffix,
+        dryRun: opts.dryRun,
+        verbose: opts.verbose,
+        noCache: opts.cache === false,
+        noOpen: opts.open === false,
+      });
+    } catch (err) {
+      console.error(`操作失败: ${err.message}`);
+      if (err.uploadErrors) {
+        for (const item of err.uploadErrors) {
+          console.error(`  ${path.basename(item.path)}: ${item.error}`);
+        }
+      }
+      process.exit(1);
+    }
   });
 
-// ========== draft：上传图片 + 创建草稿 ==========
-const draftCmd = program
-  .command('draft')
-  .description('上传图片并创建草稿');
-
-addCommonOptions(draftCmd)
+// ========== 默认命令：上传图片 + 创建草稿 ==========
+addCommonOptions(program)
   .argument('<file>', 'HTML 文件路径')
   .option('-t, --title <title>', '文章标题')
   .option('-a, --author <author>', '作者名称')
@@ -209,26 +257,37 @@ addCommonOptions(draftCmd)
   .option('--no-cache', '跳过缓存')
   .option('--media-id <id>', '更新已有草稿（传入 media_id）')
   .action(async (file, opts) => {
-    const api = createAPI(opts);
-    const state = loadState();
-
-    // 1. 上传图片，获取替换后的内容
-    console.log('步骤 1/2: 上传图片...');
-    const { content, thumbMediaId } = await uploadAndReplace(file, opts);
-
-    // 2. 创建/更新草稿
-    console.log('步骤 2/2: 创建草稿...');
-    const mediaId = opts.mediaId || state.mediaId;
     try {
+      const state = loadState();
+      const permanent = await resolveMaterialType(opts, { allowTemporary: false });
+
+      // 1. 上传图片，获取替换后的内容
+      console.log('步骤 1/2: 上传图片...');
+      const { content, thumbMediaId } = await uploadAndReplace(file, opts, permanent);
+
+      // 2. 创建/更新草稿
+      console.log('步骤 2/2: 创建草稿...');
+      const api = createAPI(opts);
+      const mediaId = opts.mediaId || state.mediaId;
       const result = await createOrUpdateDraft(api, {
         file,
         content,
         title: opts.title,
-        author: opts.author,
+        author: opts.author || '尹璐',
         digest: opts.digest,
         thumb: opts.thumb || thumbMediaId,
         mediaId,
       });
+
+      // 3. 生成草稿内容的 txt 文件（压缩成一行），文件名使用最终标题
+      const safeTitle = result.title.replace(/[\\/:*?"<>|]/g, '').trim() || 'draft';
+      const txtFile = path.join(path.dirname(path.resolve(file)), `${safeTitle}.txt`);
+      // 只提取 body 标签内的内容
+      const bodyMatch = content.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+      const bodyContent = bodyMatch ? bodyMatch[1] : content;
+      const compressedContent = bodyContent.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+      fs.writeFileSync(txtFile, compressedContent, 'utf-8');
+      console.log(`草稿内容已生成: ${txtFile}`);
 
       saveState({ mediaId: result.mediaId, file: path.resolve(file) });
 
@@ -240,6 +299,11 @@ addCommonOptions(draftCmd)
       console.log(`\n草稿已就绪，可前往公众号后台预览和发布`);
     } catch (err) {
       console.error(`操作失败: ${err.message}`);
+      if (err.uploadErrors) {
+        for (const item of err.uploadErrors) {
+          console.error(`  ${path.basename(item.path)}: ${item.error}`);
+        }
+      }
       process.exit(1);
     }
   });

@@ -14,3 +14,4 @@ node_modules/
 # WeChat CDN tool state/cache
 packages/.wechat-cdn-cache.json
 packages/.wechat-cdn-state.json
+packages/.wechat-cdn-token.json

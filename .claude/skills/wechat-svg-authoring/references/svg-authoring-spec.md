@@ -16,9 +16,34 @@
 - 视觉内容尽量使用图片层，动画控制放在外层 `<g>` 上。
 - 每个可点区域放透明热区：`<rect width="100%" height="100%" opacity="0" pointer-events="visible"/>`。
 - 对严格环境，避免依赖 `id/class/defs/use/script/style`；需要复用时可在源工程里复用，发布稿倾向展开成显式节点。
+- 硬性标签规则：文章输出层级里除 `svg` 及 SVG 内部标签外，HTML 容器只允许 `section`。不得生成 `div/span/p/a/img/details/summary/style/button/canvas/input` 等 HTML 标签。
+- 嵌套交互也必须优先按父子 `<g>` 冒泡建模，默认使用 `begin="click"`，不要为了实现方便退回 `id + begin="xxx.click"`。
 - 开发阶段图片一律优先使用本地相对路径；上线前通过 `packages` 里的 `wechat-svg-cdn` 工具批量上传并替换为微信 CDN 链接。
+- 如果用户未提供图片素材，但需求需要图片层结构，仍按 `<image>` 资源层思路设计；开发稿用同尺寸色块占位表达版面、层级和热区，等用户补图后只替换为本地图片路径。
 
-### 0.1 从案例学习到代码生成的抽象方式
+### 0.1 禁用语法清单
+
+后续生成公众号 SVG 动画时，下面语法默认不能写。除非用户明确要求做实验稿，并在交付说明中标注风险。
+
+事件与触发：
+
+- 禁止把核心交互写成 `begin="someId.click"`、`begin="someId.touchstart"`、`begin="someId.mouseover"`。
+- 禁止用 `onclick=`、`ontouchstart=`、`onload=` 等 DOM 内联事件。
+- 禁止默认使用 `mouseover`、`mouseout`、`mouseenter`、`mouseleave`、`dblclick`。
+- 禁止用 `id/class` 作为动画状态机或触发器依赖；`id` 最多作为调试标识，不能是发布稿核心逻辑。
+
+脚本与样式：
+
+- 禁止 `<script>`、`querySelector`、`getElementById`、定时器、DOM 增删改、canvas 绘制、表单输入逻辑。
+- 禁止外链 CSS：`<link rel="stylesheet">`、`@import`、外部 `.css` 文件。
+- 禁止依赖 CSS 选择器、类名选择器、全局样式表来控制 SVG 动画状态。
+
+资源与发布：
+
+- 禁止开发阶段手写微信 CDN URL；开发稿使用本地相对路径，上线前交给 `packages/wechat-svg-cdn` 替换。
+- 禁止把缺图场景改成复杂矢量重画；缺图时用同尺寸色块占位，保留后续替换 `<image>` 的结构。
+
+### 0.2 从案例学习到代码生成的抽象方式
 
 这些 `source` 案例的价值不是单个视觉，而是它们共同暴露了一套公众号 SVG 的“交互语法”。后续生成代码时，不按网页组件思路拆，而按下面五层拆：
 
@@ -43,7 +68,7 @@
 | 跟手/拖尾 | 无 JS 下做触摸触发动画替代 | `touchstart` 触发一段拖尾/飞出动画 | 不能读取手指坐标 |
 | 文字逐行/打字机 | 文字转图 + 遮罩/透明度 | 每行图片分别延迟出现，或遮罩矩形收起 | 不默认用真实字体排版 |
 
-### 0.2 后续生成 SVG 时的工作协议
+### 0.3 后续生成 SVG 时的工作协议
 
 当用户提出一个新 SVG 动画需求时，先按这个协议生成，不重新发明结构：
 
@@ -52,7 +77,8 @@
 3. 判断状态数量：一次性状态、两页切换、多步骤时间轴、循环装饰。
 4. 判断素材形态：整屏图、分层图、序列帧、局部按钮/热区、普通正文。
 5. 输出代码骨架：先写容器和 `viewBox`，再写图片层，再写动画层，最后写透明热区。
-6. 做风险声明：如果需求包含真实跟手、真实长按、复杂回退、多状态互斥，要说明微信 SVG 的限制并给替代方案。
+6. 对嵌套展开、嵌套点击、局部状态机，先尝试“父组动画 + 子组热区 + 事件冒泡”的结构；只有 source 模式无法表达时，才说明风险并使用非默认变体。
+7. 做风险声明：如果需求包含真实跟手、真实长按、复杂回退、多状态互斥，要说明微信 SVG 的限制并给替代方案。
 
 生成优先级：
 
@@ -60,7 +86,7 @@
 - 再保证布局不变形、不白线、不挡点击。
 - 最后才叠加复杂动画和装饰。
 
-### 0.3 组合模式与交互岛策略
+### 0.4 组合模式与交互岛策略
 
 从案例索引看，真实上线稿很少只用一种模式，常见是“长图切片 + 若干交互岛”的组合。后续生成复杂公众号 SVG 时，默认采用这个结构：
 
@@ -100,7 +126,7 @@
 
 样本高频可用标签：
 
-- HTML 容器：`section`、`div`、`span`、`p`、`a`、`img`。
+- HTML 容器：严格生成规则只允许 `section`。历史样本中出现的 `div`、`span`、`p`、`a`、`img` 只能作为源码学习证据，不得在新生成稿中使用。
 - SVG 容器和图形：`svg`、`g`、`foreignObject`、`image`、`rect`、`path`、`polygon`。
 - SVG 动画：`animate`、`animateTransform`、`animateMotion`、`set`。
 - 少量可用但不作为默认：`defs`、`clipPath`、`use`。
@@ -111,6 +137,7 @@
 - `script`：样本中未作为交互核心出现，公众号环境会限制或过滤，后续生成不依赖 JS。
 - 外链 `link rel="stylesheet"`：不要用。样本依赖内联 `style`。
 - `style` 标签：不要作为默认，样本主要是行内样式。
+- `details/summary`：禁止用于展开收起。公众号 SVG 交互必须用 `section + svg + SMIL/透明热区` 实现。
 - `canvas/video/audio/iframe/form/input`：不作为 SVG 动画方案依赖，微信文章环境不可控。
 - `defs/use/clipPath`：个别老稿出现，但 JZCreative 严格策略建议规避。发布前未实测时，不把关键交互放在这些标签上。
 
@@ -127,7 +154,40 @@
 </section>
 ```
 
-### 1.2 CSS 支持情况
+### 1.2 SVG 动画属性白名单
+
+后续生成 SVG/SMIL 动画时，`animate`、`set`、`animateTransform`、`animateMotion` 的可动画属性必须从此白名单选择。该表作为微信团队 2016-2025 SVG `attributeName` 白名单参考；不在表内的属性默认禁止作为动画属性。
+
+| 序号 | 元素 | Name / type | 用途与规则 |
+| --- | --- | --- | --- |
+| 1 | `animate` | `x` | 控制简单几何体 x 轴移动，可用于柱状图、滑块、局部元素位移。 |
+| 2 | `animate` | `y` | 控制简单几何体 y 轴移动，可用于柱状图、上下入场。 |
+| 3 | `animate` | `width` | 控制宽度变化，适合伸长式图文、宽度自适应、占位释放。 |
+| 4 | `animate` | `height` | 控制高度变化，适合伸长式图文、预占位、折叠释放。 |
+| 5 | `animate` | `opacity` | 控制透明度，取值 `0` 到 `1`，适合显隐、淡入淡出、序列帧。 |
+| 6 | `animate` | `d` | 控制贝塞尔曲线补间，但表现具有随机性；不作为默认方案。 |
+| 7 | `animate` | `points` | 控制多边形补间，但表现具有随机性；不作为默认方案。 |
+| 8 | `animate` | `stroke-width` | 控制描边宽度，适合线条强调、描边变化。 |
+| 9 | `animate` | `stroke-linecap` | 控制描边端点，适合进度线、遮罩线条等；需实测。 |
+| 10 | `animate` | `stroke-dashoffset` | 控制描边偏移，适合遮罩动画、饼/分图、进度线。 |
+| 11 | `animate` | `fill` | 控制填充色过渡；用于简单色块反馈，不用于复杂 UI 主题切换。 |
+| 12 | `set` | `visibility` | 控制可见性，取值 `visible`、`hidden`、`collapse`、`inherit`；适合状态机、防误触。 |
+| 13 | `animateTransform` | `translate` | 控制路径和编组位移，是点击切换、嵌套展开、视差入场的默认主力。 |
+| 14 | `animateTransform` | `scale` | 控制路径和编组 x/y 缩放，适合按压反馈、放大、伸缩。 |
+| 15 | `animateTransform` | `rotate` | 控制路径和编组旋转，适合装饰循环、翻转、指针。 |
+| 16 | `animateTransform` | `skewX` | 控制 x 轴倾斜，可用于台历翻阅等倾斜效果；需实测。 |
+| 17 | `animateTransform` | `skewY` | 控制 y 轴倾斜，可用于书籍翻阅等倾斜效果；需实测。 |
+| 18 | `animateMotion` | `path` | 控制单行/复杂轨迹动画，可通过 `rotate` 定义朝向，适合轨迹飞行。 |
+
+强制规则：
+
+- `attributeName` 只能写白名单中的 `x/y/width/height/opacity/d/points/stroke-width/stroke-linecap/stroke-dashoffset/fill/visibility/transform`。
+- `animateTransform type` 只能写白名单中的 `translate/scale/rotate/skewX/skewY`。
+- `animateMotion` 只能用于 `path` 轨迹动画，不作为普通位移默认方案。
+- `d`、`points`、`stroke-linecap`、`skewX`、`skewY` 属于高风险白名单项；生成时必须有明确需求，且交付说明中提示需微信预览验证。
+- 不得生成白名单外动画属性，例如 `clip-path`、`filter`、`transform-origin`、`background-position`、`left/top`、`margin`、`z-index`、`display` 等作为 SMIL 动画目标。
+
+### 1.3 CSS 支持情况
 
 稳定可用的行内 CSS：
 
@@ -155,7 +215,7 @@
 </section>
 ```
 
-### 1.3 JS 限制
+### 1.4 JS 限制
 
 结论：后续生成默认不写 JS。上线样本的核心交互由 SVG SMIL 事件完成：
 
@@ -181,7 +241,7 @@
 </g>
 ```
 
-### 1.4 资源引用方式
+### 1.5 资源引用方式
 
 开发/上线资源规则：
 
@@ -203,6 +263,29 @@
 
 <!-- HTML img -->
 <img src="./images/photo.jpg" alt=""/>
+```
+
+缺图占位协议：
+
+- 用户只给尺寸和交互需求、未给真实图片时，不追问图片也不停止生成；按用户给的画布尺寸继续完成可运行 SVG。
+- 占位稿保持“真实图片将来会出现”的结构：需要整屏图、分层图、按钮图、序列帧图的位置，都先用同尺寸 `<rect>` 色块代替。
+- 占位色块只用于开发预览，不是发布资源；用户补图后，把色块替换为 `<image href="./images/xxx.png" width="..." height="..."/>`，动画和热区结构不变。
+- 占位层命名或注释应说明目标素材，例如 `bg-placeholder`、`button-placeholder`、`frame-01-placeholder`，便于后续替换。
+- 不用复杂 SVG 图形临摹真实 UI；占位只表达尺寸、层级、状态和交互范围。
+
+缺图占位模板：
+
+```html
+<svg viewBox="0 0 750 1334" style="display:block;width:100%;">
+  <!-- TODO: replace with <image href="./images/bg.png" width="750" height="1334"/> -->
+  <rect width="750" height="1334" fill="#f3f4f6"/>
+
+  <!-- TODO: replace with <image href="./images/card.png" x="72" y="180" width="606" height="420"/> -->
+  <rect x="72" y="180" width="606" height="420" rx="12" fill="#dbeafe"/>
+
+  <rect x="160" y="1080" width="430" height="96" rx="48" fill="#2563eb"/>
+  <rect x="160" y="1080" width="430" height="96" opacity="0" pointer-events="visible"/>
+</svg>
 ```
 
 上线命令：
@@ -236,6 +319,120 @@ wechat-svg-cdn draft ./article.html -t "文章标题"
 - 开发稿允许本地路径；发布稿必须经过工具替换成本地图片对应的微信 CDN 链接。
 - 大图按展示宽度导出，避免 1080 宽全篇超重。
 - 序列帧控制帧数，优先 12-30 帧局部动画；超过 50 帧要评估加载和卡顿。
+
+---
+
+## 1A. 交互与动画质量规范
+
+本节吸收外部 SVG 交互设计执行规范，并按公众号 SVG 的可实现范围转成生成检查项。它不替代前面的微信兼容规则；如果发生冲突，优先遵守“无 JS、无外链 CSS、无 ID 触发依赖、父子 `<g>` 冒泡”的规则。
+
+### 1A.1 交互结构
+
+必须存在明确的交互结构，触发来源可为：
+
+- 自动：`begin="0s"`、`repeatCount="indefinite"`、延时自动播放。
+- 点击：`begin="click"`，通过透明热区向父级 `<g>` 冒泡。
+- 触摸开始：`begin="touchstart"`，适合按压反馈、半自动长按替代。
+- 触摸结束：只作为风险写法，不默认依赖；微信环境不如 `touchstart` 稳定。
+- 触摸移动/滚动：优先用原生滚动容器、横滑容器、视差滚动，不用 JS 读取坐标。
+- 组合触发：`click+Ns`、`touchstart+Ns`、自动循环 + 点击冻结/转场。
+- 半自动触发：用户点击/触摸后，后续动画按时间轴自动接续，例如 `click+0.3s`、`click+1.2s`。
+
+生成时必须能回答：
+
+- 用户在哪里触发。
+- 哪个透明热区接收事件。
+- 事件沿哪条父子链冒泡。
+- 触发后哪个视觉状态发生显著变化。
+
+### 1A.2 触发器与触发意符
+
+触发器应结构可靠，默认使用：
+
+- 矩形：`<rect opacity="0" pointer-events="visible"/>`，最稳定。
+- 圆形：可用 `<circle opacity="0" pointer-events="visible"/>`，适合圆按钮。
+- 多边形：可用 `<polygon opacity="0" pointer-events="visible"/>`，适合不规则但边界清楚的区域。
+- 复合路径：可用 `<path opacity="0" pointer-events="visible"/>`，只在需要精细命中区时使用。
+
+触发意符要明确：
+
+- 视觉上应有按钮、箭头、卡片边界、可点击区域、滑动方向提示等线索。
+- 透明热区不得大到遮挡横滑/滚动手势。
+- 热区不要贴边，移动端建议保留 24-40 设计像素容错。
+- 装饰层默认 `pointer-events:none`，交互层单独打开 `pointer-events:visible`。
+
+### 1A.3 反馈设计
+
+交互必须给用户最终明确反馈：
+
+- 点击后视觉变化要显著，不能只有极小透明度变化。
+- 反馈位置应可预期，并尽量保留在用户触发时的视窗范围内。
+- 展开、伸长、翻页、换图、亮起、消失、按钮状态变化，都应有明确终态。
+- 一次性反馈用 `fill="freeze"` 定格，避免播放完回到初始状态造成误解。
+- 多步剧情应让下一步入口在当前反馈区域内出现，减少用户找不到下一触发点的风险。
+
+### 1A.4 动画表达与缓动
+
+优先选择具备物理感的动画表达：
+
+- 位移、伸长、入场、回弹类动画宜使用 `calcMode="spline"` 和 `keySplines`。
+- 切帧、状态机、瞬时切换类动画宜使用 `calcMode="discrete"` 或极短 `keyTimes`。
+- 装饰循环可用线性匀速，但核心交互反馈不宜全部匀速。
+
+常用缓动映射：
+
+```html
+<!-- linear: 匀速 -->
+<animateTransform calcMode="linear" .../>
+
+<!-- ease-in: 缓入 -->
+<animateTransform calcMode="spline" keyTimes="0;1" keySplines="0.42 0 1 1" .../>
+
+<!-- ease-out: 缓出 -->
+<animateTransform calcMode="spline" keyTimes="0;1" keySplines="0 0 0.58 1" .../>
+
+<!-- ease-in-out: 缓入缓出 -->
+<animateTransform calcMode="spline" keyTimes="0;1" keySplines="0.42 0 0.58 1" .../>
+```
+
+缓动函数坐标区间必须保持在 `0 0` 到 `1 1` 的合法区间内。复杂动画可分段写多个 `keySplines`，数量必须与 `keyTimes` 分段匹配。
+
+### 1A.5 基本动画承载结构
+
+伸长：
+
+- 适用：点击展开长内容、层层展开、报告/档案/目录详情。
+- 公众号 SVG 默认结构：零高容器 + 展开内容 + 封面热区宽高/位移状态切换。
+- 可嵌套或接续新一组伸长，但每一层都要有独立父子冒泡链，不共享 `id/class` 状态。
+
+穿透触发：
+
+- 适用：多层覆盖、装饰层与交互层重叠、点击区域需要透过上层视觉。
+- 默认通过 `pointer-events:none` / `pointer-events:visible` 管理层响应关系。
+- 装饰层关闭事件，透明热区或链接层打开事件。
+
+双层触发：
+
+- 适用：一次点击需要同时带动视觉变化、占位变化、预加载层隐藏、下一状态显示等多个存在冲突的动作。
+- 公众号 SVG 默认用双层或多层父子 `<g>`，让同一次 `click` 冒泡触发多个祖先动画。
+- 不默认用 `id + begin="xxx.click"` 来指定多个目标。
+
+零高容器/结构：
+
+- 适用：同屏堆叠、点击伸长、覆盖式展开、预加载优化。
+- 典型结构：`<section style="height:0;line-height:0;overflow:visible;">` 后接占位 SVG。
+- 风险：热区遮挡、后文占位错乱、微信预览高度释放差异；生成后必须检查。
+
+### 1A.6 防误触与重复执行
+
+应采用防误触设计，避免动画预期外重复执行或无法执行：
+
+- 一次性点击状态默认 `restart="never"`。
+- 需要终态保留时默认 `fill="freeze"`。
+- 透明热区只覆盖必要范围，避免盖住滚动/横滑。
+- 已经进入下一状态后，旧热区应通过位移、透明度、`visibility` 或父组远距移动失效。
+- 自动循环装饰使用 `pointer-events:none`，避免抢点击。
+- 多层展开时，下一层热区只有在父层展开态内才出现。
 
 ---
 
@@ -1006,6 +1203,8 @@ JZCreative 规则强调严格环境下 `id/class/defs/embed` 可能被过滤或�
 - 事件用父子 `<g>` 冒泡，不用 `begin="xxx.click"`。
 - 样式用行内，不用类选择器。
 - 发布稿少用 ID，最多作为调试标识，不能作为逻辑依赖。
+- 不能因为嵌套状态机“更容易指定触发源”就使用 `id + begin="layerTap.click"` 作为默认方案；这属于通用 SVG 思维，不是公众号 source 案例沉淀出的默认规则。
+- 如果确实必须绑定具体触发源，先在交付说明里标注它是例外，并给出为什么无 ID 冒泡无法表达。
 
 ---
 

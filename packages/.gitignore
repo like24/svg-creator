@@ -1,2 +1,5 @@
 node_modules/
 .env
+.wechat-cdn-cache.json
+.wechat-cdn-state.json
+.wechat-cdn-token.json

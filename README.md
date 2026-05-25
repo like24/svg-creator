@@ -67,6 +67,7 @@ cp .env.example .env  # 填入 WECHAT_APP_ID 和 WECHAT_APP_SECRET
 `source/notes/` 下包含：
 
 - `svg-authoring-spec.md` — 公众号 SVG 动画开发规范与模式库
+- `svg-learned-assets.md` — 已学习资产表，记录 `source/*.html` 的内容指纹、状态和模式摘要
 - `svg-case-index.md` — 全量案例索引，按布局/交互/技术点归类
 - `svg-case-evidence.md` — 全量案例复读证据表
 - `svg-layout-patterns.md` — SVG 布局与排版模式笔记
@@ -114,7 +115,8 @@ cp .env.example .env  # 填入 WECHAT_APP_ID 和 WECHAT_APP_SECRET
 
 ```text
 使用 wechat-svg-authoring skill，学习 source 里新增的公众号 SVG 案例。
-请先更新 source/notes/svg-case-evidence.md，再更新 svg-case-index.md。
+请先运行已学习资产表脚本，识别新增/变更案例。
+再更新 source/notes/svg-case-evidence.md 和 svg-case-index.md。
 如果发现新的可复用规则，再更新 svg-authoring-spec.md。
 最后同步 .codex 和 .claude skill references。
 ```
@@ -122,16 +124,19 @@ cp .env.example .env  # 填入 WECHAT_APP_ID 和 WECHAT_APP_SECRET
 更新顺序必须是：
 
 ```text
-案例证据表 → 案例索引 → 开发规范 → skill references
+已学习资产表 → 案例证据表 → 案例索引 → 开发规范 → 再跑资产表 → skill references
 ```
 
 辅助脚本：
 
 ```bash
+node .codex/skills/wechat-svg-authoring/scripts/update-learned-assets.js source
 node .codex/skills/wechat-svg-authoring/scripts/extract-case-evidence.js source
 ```
 
-该脚本会提取每个案例的标签、触发事件、动画属性、viewBox、横滑/触摸/序列帧等证据，供更新 `svg-case-evidence.md` 使用。
+`update-learned-assets.js` 会维护 `source/notes/svg-learned-assets.md`，用内容指纹识别新增/变更案例，不依赖文件命名规则。
+
+`extract-case-evidence.js` 会提取每个案例的标签、触发事件、动画属性、viewBox、横滑/触摸/序列帧等证据，供更新 `svg-case-evidence.md` 使用。
 
 ## 环境要求
 

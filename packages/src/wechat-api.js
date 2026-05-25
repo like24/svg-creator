@@ -1,6 +1,7 @@
 const axios = require('axios');
 
 const BASE_URL = 'https://api.weixin.qq.com/cgi-bin';
+const TOKEN_ERROR_CODES = new Set([40001, 42001]);
 
 class WechatAPI {
   constructor(tokenManager) {
@@ -8,16 +9,22 @@ class WechatAPI {
   }
 
   async _post(endpoint, data) {
-    const token = await this.tokenManager.getToken();
-    const res = await axios.post(`${BASE_URL}/${endpoint}?access_token=${token}`, data);
-    const result = res.data;
-    if (result.errcode && result.errcode !== 0) {
-      if (result.errcode === 40001 || result.errcode === 42001) {
+    let lastResult;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const token = await this.tokenManager.getToken();
+      const res = await axios.post(`${BASE_URL}/${endpoint}?access_token=${token}`, data);
+      const result = res.data;
+      lastResult = result;
+      if (!result.errcode || result.errcode === 0) {
+        return result;
+      }
+      if (TOKEN_ERROR_CODES.has(result.errcode) && attempt === 0) {
         this.tokenManager.clearToken();
+        continue;
       }
       throw new Error(`[${result.errcode}] ${result.errmsg}`);
     }
-    return result;
+    throw new Error(`[${lastResult.errcode}] ${lastResult.errmsg}`);
   }
 
   // 创建草稿

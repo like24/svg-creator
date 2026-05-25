@@ -93,3 +93,44 @@
 
 - `svg-case-index.md` 应从“初级归类”升级为“证据归类”，逐步引用本文件的触发和动画证据。
 - `svg-authoring-spec.md` 的模式库需补充：`set visibility` 状态机、`opacity` 高速序列帧、编辑器零高容器这三类高频写法。
+
+## 4. 增量补录（2026-05-21）
+
+| 文件 | 结构/布局证据 | 交互证据 | 动画证据 | 可复用判断 |
+| --- | --- | --- | --- | --- |
+| `2023年，我们为何还在孜孜不倦地做一本好杂志？.html` | `section/svg/animate/circle` 密集，`900/540` 坐标族，杂志长卷 | `click`、`click+Ns`、自动时点 | `opacity/r/width/transform/visibility`、离散帧 | 杂志叙事、编辑部故事、视差长卷 |
+| `GODIVA中秋数字藏品NFT限量首发！.html` | `foreignObject` 分段，`750` 宽视差长图 | 链接热区为主 | 静态/轻交互 | 数字藏品、节日礼盒、品牌活动 |
+| `SVG排版案例 横向滑动视差相册（缩略图与大图）.html` | 横向吸附相册，缩略图/大图联动 | 滚动浏览 | 吸附横滑、视差层、`foreignObject` | 横向相册、产品缩略图联动 |
+| `SVG排版案例 纵向滑动视差相册（缩略图与大图）.html` | 纵向长图相册，分层视差 + 缩略图 | 滚动浏览 | 纵向局部滚动、视差 | 纵向图集、展览相册 |
+| `VIP购物盛荟 会员尊享至高20倍万象星，点击定制你的专属秋日风尚图鉴.html` | 购物图鉴，横滑吸附，多视频/多热区 | `click`、链接热区 | `opacity/visibility/x` | 商场会员活动、图鉴页 |
+| `svg排版案例 长按差速运动.html` | 长画布差速运动，`animateTransform` 密集 | `touchstart`/`touchend` | `transform` 差速动画 | 长按模拟、按压差速 |
+| `《安邸AD》夏季新刊揭晓｜本期客座编辑这次真的太…….html` | 杂志长卷，`section/svg/animate/circle` 高密度 | `click`、`click+Ns` | `opacity/r/width/visibility/transform` | 杂志发布、编辑部故事 |
+| `产业数字人：假期不打烊，服务不缺席.html` | 数字人服务专题，视差分段 | 自动开始，少量点击 | `transform/opacity/width/visibility/x` | 数字人专题、假期值守 |
+| `光与影｜冬季26系列.html` | 时尚大片，多热区浮层，节点极密 | 高频 `touchstart`/`click` | `transform/opacity/x/visibility/width`、大量 `set` | 商品大片、复杂互动 |
+| `几个数，看懂为什么TA这么强.html` | 单屏状态组，`1080x1920` 多层 | 多个 `click` | `transform/visibility/x` | 数据卖点、逐项揭示 |
+| `前方高能，凭实力出场.html` | `750` 宽活动长图，横滑 + 视差 + 热区 | 链接热区为主 | 静态/视差布局 | 新品出场、活动导流 |
+| `十月你好！下半年最值得期待的科技大会终于要来了！.html` | 超长 `1080x19180` 报告式预告 | `click`、`click+0.5s`、自动 | `transform/opacity/visibility/x` | 大会预告、议程亮点 |
+| `即时征途，步履不停——达达集团2023年终盘点.html` | 年终盘点，长段组合 | `click`、`click+1s`、`0.5s` | `transform/width/height/visibility/x` | 企业盘点、时间轴推进 |
+| `品星种草，精种增长丨2026巨量引擎品星云618营销全景图谱发布.html` | 营销全景图，横滑吸附 + 视差 | `touchstart/touchmove/mousedown/click` | `transform/opacity/width/x`、离散帧 | 营销图谱、可滑动架构 |
+| `在吗？想邀你种一个明天🤝.html` | 零高容器 + 伸长结构 | `click;mouseup`、`touchstart;mousedown` | `height/transform/opacity/width` | 种植/公益互动、伸长提示 |
+| `在周杰伦的名画世界穿行（SVG）.html` | 名画穿行，推出式封面 + 全局视差 | 自动时间点、链接 | `visibility/width` | 艺术展览、名画导览 |
+| `大片上演，谁是你的挚爱主角？.html` | 多段视差大片页，`960` 宽 | 滚动浏览 | 视差、零高拼接 | 影视主角选择、品牌大片 |
+| `小龙虾「饲养」指南（SVG版）.html` | 饲养指南，背景图 + 等分容器滑动 | `click`、`click+Ns` | `visibility/transform/width/opacity` | 指南型互动、食物养成 |
+| `年中钜惠开启 美妆沙龙香限时直降！点击探秘MIXC美妆博物馆（文末福利）.html` | 美妆活动，横滑 + 视差 + 视频/热区 | 少量 `click` | `width/transform/visibility` | 商场活动、博物馆式导览 |
+| `引爆UGC狂欢：解锁AI共创新玩法.html` | UGC/AI 玩法专题，路径插图 + 点击时间轴 | `click`、`click+0.1s`、自动 | `visibility/opacity/width/transform/x` | AI 玩法解锁、UGC 活动 |
+| `当 Pharrell 的 LV 男装回到《穿越大吉岭》.html` | 时尚文章，窄画布长图，图文混排密集 | 自动时间点 | `opacity/height/transform/width`、离散帧 | 时尚叙事、影像文章 |
+| `心向世界，和而不同.html` | 全球化主题，多尺寸视差结构 | 少量 `click` | `width/visibility/x` | 全球化叙事、价值观长图 |
+| `快上车！火山引擎超级拍档计划来啦.html` | 活动招募页，视差长段 | `click`、`click+0.1s` | `visibility/opacity/width/x` | 招募活动、权益卡片 |
+| `快手生活服务，用好服务让生意好上天！.html` | 生活服务专题，横滑吸附 + 触摸移动 | `mousedown/touchstart`、`mouseup/click`、`touchmove` | `opacity/transform/width/visibility/x` | 服务案例、触摸滑动反馈 |
+| `我们的2023.html` | 年度回顾，多屏状态 | `click/click+1s/touchstart/touchmove` | `opacity/transform/width/height/visibility` | 年度回顾、多屏记忆 |
+| `旅行这件事，Atego是动真格的.html` | 静态长图，`1080/3240` 大画布 | 无明显触发 | 静态切片 | 汽车旅行主题、长图展示 |
+| `来了！3月品牌SVG交互排版Top10！.html` | 案例榜单长文，横滑/链接密集 | 链接热区为主 | 少量 `opacity/width` | 案例合集、榜单文章 |
+| `每日prompt｜我爱记单词，如何五步打造单词记忆神器.html` | Prompt 教程，多状态分段 | `click/touchstart/touchmove` | `opacity/transform/width/visibility/x` | AI 教程、步骤卡片 |
+| `点击长按！领取你的专属新春祝福.html` | 横向吸附结构，轻量祝福页 | 自动循环为主 | `transform` 循环 | 新春祝福领取、节日入口 |
+| `码蹄杯——菁英班大神们的快问快答！.html` | 问答活动，路径插图 + 点击显隐 | `click`、`click+0.5s` | `visibility/width/opacity/transform/x` | 快问快答、竞赛宣传 |
+| `请查收 《RIO强爽春节金条报告》.html` | 春节报告，点击显隐 + 链接热区 | `click`、`click+0.5s` | `visibility/height/opacity/width/transform` | 节日报告、福利领取 |
+| `进 来 拼 豆 .SVG.html` | 拼豆互动，背景图 + 零高/占位/左右漂移 | `click`、`touchstart`、`click+Ns` | `opacity/transform/x/height/visibility` | 拼图小游戏、轻量 DIY |
+| `银泰百货，人类高质量双11狂欢地.html` | 商场双11活动，视差 + 多宽度画布 | `click`、自动 | `transform/width/visibility/x` | 商场大促、楼层活动 |
+| `预告 倒计时3天，学部君邀你DIY五周年海报！.html` | DIY 海报预告，吸附横滑 + 视差 | 少量 `click` | `opacity/visibility/x` | DIY 海报、倒计时预告 |
+| `高温“烤”验下，空调企业如何降本又增收？.html` | 空调行业长文，点击显隐 | `click`、`click+0.3s` | `transform/visibility/x` | B2B 行业解读 |
+| `鳄趣横生 尽享假日.html` | 假日专题，视差长图 + 热区 | 无明显触发 | 静态/视差布局 | 旅游专题、节日导流 |
