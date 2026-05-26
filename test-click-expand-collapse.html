@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点击展开-可收起</title>
+</head>
+
+<body>
+    <section style="margin-bottom: 0px; overflow: hidden; font-size: 0px; line-height: 0; pointer-events: none; user-select: none; -webkit-tap-highlight-color: transparent; visibility: visible;">
+
+        <section style="overflow: hidden; margin-top: -1px;">
+
+            <!-- 展开层：初始在可视区外 -->
+            <svg viewBox="0 0 1080 1080"
+                style="transform: scale(1); display: block; width: 100%; max-width: none !important; pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;">
+
+                <!-- 点击封面后：移入可视区（延迟 0.5s） -->
+                <animateTransform calcMode="spline" attributeName="transform" type="translate"
+                    values="-666666 0;0 0;0 0" dur="1s"
+                    keyTimes="0;0.9;1" keySplines=".42,0,.58,1;.42,0,.58,1"
+                    fill="freeze" restart="never" begin="click+0.5s" />
+
+                <!-- 点击封面后：淡入（延迟 0.5s） -->
+                <animate attributeName="opacity"
+                    values="0;1;1" dur="1s"
+                    keyTimes="0;0.5;1"
+                    fill="freeze" restart="never" begin="click+0.5s" />
+
+                <!-- 点击收起后：移出可视区 -->
+                <animateTransform calcMode="spline" attributeName="transform" type="translate"
+                    values="0 0;-666666 0;-666666 0" dur="1s"
+                    keyTimes="0;0.9;1" keySplines=".42,0,.58,1;.42,0,.58,1"
+                    fill="freeze" restart="never" begin="click" />
+
+                <!-- 点击收起后：淡出 -->
+                <animate attributeName="opacity"
+                    values="1;0;0" dur="1s"
+                    keyTimes="0;0.5;1"
+                    fill="freeze" restart="never" begin="click" />
+
+                <g>
+                    <!-- 展开内容 -->
+                    <rect width="1080" height="900" fill="#27ae60" />
+                    <text x="540" y="200" text-anchor="middle" fill="white" font-size="48">展开的内容</text>
+                    <text x="540" y="300" text-anchor="middle" fill="white" font-size="36">这里是详细内容区域</text>
+
+                    <!-- 收起按钮 -->
+                    <rect x="340" y="700" width="400" height="100" rx="50" fill="#e74c3c"
+                        style="pointer-events: visible;" />
+                    <text x="540" y="765" text-anchor="middle" fill="white" font-size="42">收起</text>
+                </g>
+
+                <g>
+                    <!-- 点击收起后：隐藏热区 -->
+                    <set attributeName="visibility" from="visible" to="hidden"
+                        fill="freeze" restart="never" begin="click" />
+
+                    <!-- 透明热区（覆盖收起按钮区域） -->
+                    <rect x="340" y="700" width="400" height="100" fill="#39f" opacity="0"
+                        style="pointer-events: visible;">
+                        <animate attributeName="x" values="88888888" dur="0.001s"
+                            fill="freeze" restart="never" begin="click" />
+                    </rect>
+                </g>
+            </svg>
+
+            <!-- 封面层：点击展开 -->
+            <svg viewBox="0 0 1080 500"
+                style="transform: scale(1) translateZ(1px); display: block; width: 100%; max-width: none !important; pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;">
+
+                <!-- 点击后：宽度放大 -->
+                <animate calcMode="spline" attributeName="width"
+                    values="100%;216%;216%" dur="1s"
+                    keyTimes="0;0.9;1" keySplines=".42,0,.58,1;.42,0,.58,1"
+                    fill="freeze" restart="never" begin="click+0.5s" />
+
+                <!-- 点击后：淡出 -->
+                <animate attributeName="opacity"
+                    values="1;0;0" dur="1s"
+                    keyTimes="0;0.5;1"
+                    fill="freeze" restart="never" begin="click" />
+
+                <g>
+                    <!-- 封面内容 -->
+                    <rect width="1080" height="500" fill="#3498db" />
+                    <text x="540" y="250" text-anchor="middle" fill="white" font-size="48">点击展开</text>
+                </g>
+
+                <g>
+                    <!-- 点击后：隐藏热区 -->
+                    <set attributeName="visibility" from="visible" to="hidden"
+                        fill="freeze" restart="never" begin="click" />
+
+                    <!-- 透明热区 -->
+                    <rect x="0" y="0" width="1080" height="500" fill="#39f" opacity="0"
+                        style="pointer-events: visible;">
+                        <animate attributeName="x" values="88888888" dur="0.001s"
+                            fill="freeze" restart="never" begin="click" />
+                    </rect>
+                </g>
+            </svg>
+
+        </section>
+
+    </section>
+</body>
+
+</html>

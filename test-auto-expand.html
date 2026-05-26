@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动展开 - 色块测试</title>
+</head>
+
+<body>
+    <section
+        style="overflow: hidden; font-size: 0px; line-height: 0; pointer-events: none; user-select: none; -webkit-tap-highlight-color: transparent; visibility: visible;">
+
+        <!-- 第一个区块 -->
+        <section style="overflow: hidden; margin-top: -1px;">
+
+            <!-- 零高容器：底层展开后内容 -->
+            <section style="height: 0;">
+                <svg viewBox="0 0 1080 1800" style="display: block; width: 100%; margin-top: -1px;">
+                    <rect width="1080" height="1800" fill="#27ae60" />
+                    <text x="540" y="300" text-anchor="middle" fill="#fff" font-size="72"
+                        style="pointer-events: none; user-select: none;">展开后显示的内容</text>
+                </svg>
+            </section>
+
+            <!-- 交互 SVG：初始可见层，自动展开 -->
+            <svg viewBox="0 0 1080 800"
+                style="transform: scale(1) translateZ(1px); display: block; width: 100%; max-width: none !important;">
+                <!-- 自动：宽度放大 -->
+                <animate calcMode="spline" attributeName="width" values="100%;216%;216%" dur="1s"
+                    keyTimes="0;0.9;1" keySplines=".42,0,.58,1;.42,0,.58,1" fill="freeze" restart="never"
+                    begin="2.5s"></animate>
+                <!-- 自动：隐藏交互层 -->
+                <set attributeName="visibility" from="visible" to="hidden" fill="freeze" restart="never"
+                    begin="2.5s"></set>
+                <g>
+                    <set attributeName="visibility" from="visible" to="hidden" fill="freeze" restart="never"
+                        begin="2.5s"></set>
+                    <!-- 自动：淡出 -->
+                    <animate attributeName="opacity" values="1;0;0" dur="1s" keyTimes="0;0.5;1" fill="freeze"
+                        restart="never" begin="2s"></animate>
+                    <rect width="1080" height="800" fill="#3498db" style="pointer-events: none;" />
+                    <text x="540" y="350" text-anchor="middle" fill="#fff" font-size="72"
+                        style="pointer-events: none; user-select: none;">初始内容</text>
+                    <text x="540" y="480" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="48"
+                        style="pointer-events: none; user-select: none;">即将自动展开...</text>
+                </g>
+            </svg>
+
+        </section>
+
+    </section>
+</body>
+
+</html>
