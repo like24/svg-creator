@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2026-种草大赏-九大赛道</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <section style="width: 100%; margin: 0; padding: 0; overflow: hidden">
+      <svg
+        viewBox="0 0 1080 1907"
+        style="
+          display: block;
+          width: 100%;
+          margin-top: -1px;
+          background: url(./imgs/header.jpg) 0 0 / 100% 100% no-repeat;
+          pointer-events: none;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
+        "
+      ></svg>
+
+      <svg viewBox="0 0 1080 1134" style="display: block; width: 100%; margin-top: -1px; -webkit-tap-highlight-color: transparent">
+        <image href="./imgs/card1/1.png" x="0" y="0" width="1080" height="1134"></image>
+        <g>
+          <g style="cursor: pointer">
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              from="0 0"
+              to="-1250 0"
+              begin="click"
+              dur="0.8s"
+              fill="freeze"
+              restart="never"
+            />
+            <image href="./imgs/card1/left2.png" x="0" y="0" width="1080" height="1134"></image>
+            <image href="./imgs/card1/left1.png" x="0" y="0" width="1080" height="1134"></image>
+
+            <g>
+              <animateTransform
+                attributeName="transform"
+                type="translate"
+                from="0 0"
+                to="2500 0"
+                begin="click"
+                dur="0.8s"
+                fill="freeze"
+                restart="never"
+              />
+
+              <!-- 图片3最终向右移动1250 -->
+              <image href="./imgs/card1/right.png" x="0" y="0" width="1080" height="1134"></image>
+              <g>
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  from="0 0"
+                  to="-1250 0"
+                  begin="click"
+                  dur="0.8s"
+                  fill="freeze"
+                  restart="never"
+                />
+                <image href="./imgs/card1/mask.png" x="0" y="0" width="1080" height="1134"></image>
+
+                <image href="./imgs/card1/tip.png" x="0" y="0" width="1080" height="1134">
+                  <animate
+                    attributeName="opacity"
+                    values="1;0.6;1"
+                    dur="2s"
+                    repeatCount="indefinite"
+                    begin="0s"
+                    calcMode="spline"
+                    keyTimes="0;0.5;1"
+                    keySplines=".42 0 .58 1;.42 0 .58 1"
+                  ></animate>
+                  <set attributeName="visibility" from="visible" to="hidden" begin="click" fill="freeze" restart="never" />
+                  <animate attributeName="x" from="0" to="88888888" begin="click" dur="0.001s" fill="freeze" restart="never" />
+                  <rect
+                    x="0"
+                    y="0"
+                    width="1080"
+                    height="1134"
+                    fill="#3399ff"
+                    opacity="1"
+                    style="pointer-events: visible; cursor: pointer"
+                  ></rect>
+                </image>
+              </g>
+            </g>
+          </g>
+        </g>
+      </svg>
+
+   
+    </section>
+  </body>
+</html>

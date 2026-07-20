@@ -4,14 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>2026-种草大赏-九大赛道</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-      }
-    </style>
   </head>
-  <body>
+  <body style="margin: 0; padding: 0">
     <section style="width: 100%; margin: 0; padding: 0; overflow: hidden">
       <svg
         viewBox="0 0 1080 1907"
@@ -25,8 +19,19 @@
           -webkit-tap-highlight-color: transparent;
         "
       ></svg>
-
-      <svg viewBox="0 0 1080 1134" style="display: block; width: 100%; margin-top: -1px; -webkit-tap-highlight-color: transparent">
+      <svg
+        viewBox="0 0 1080 350"
+        style="
+          display: block;
+          width: 100%;
+          margin-top: -1px;
+          background: url(./imgs/title1.png) 0 0 / 100% 100% no-repeat;
+          pointer-events: none;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
+        "
+      ></svg>
+      <svg viewBox="0 0 1080 1134" style="display: block; width: 100%; margin-top: -2px; -webkit-tap-highlight-color: transparent">
         <image href="./imgs/card1/1.png" x="0" y="0" width="1080" height="1134"></image>
         <g>
           <g style="cursor: pointer">
@@ -68,9 +73,252 @@
                   fill="freeze"
                   restart="never"
                 />
-                <image href="./imgs/card1/mask.png" x="0" y="0" width="1080" height="1134"></image>
 
-                <image href="./imgs/card1/tip.png" x="0" y="0" width="1080" height="1134">
+                <!-- 提示层点击后立即左移；揭晓层用反向位移保持原位 -->
+                <g>
+                  <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    from="0 0"
+                    to="-1250 0"
+                    begin="click"
+                    dur="0.001s"
+                    fill="freeze"
+                    restart="never"
+                  />
+
+                  <image href="./imgs/tip.png" x="0" y="0" width="1080" height="1134" style="pointer-events: none">
+                    <animate
+                      attributeName="opacity"
+                      values="1;0.6;1"
+                      dur="2s"
+                      repeatCount="indefinite"
+                      begin="0s"
+                      calcMode="spline"
+                      keyTimes="0;0.5;1"
+                      keySplines=".42 0 .58 1;.42 0 .58 1"
+                    ></animate>
+                  </image>
+
+                  <!-- 1.png 默认隐藏，点击 0.8s 后开始淡入 -->
+                  <g opacity="0">
+                    <animateTransform
+                      attributeName="transform"
+                      type="translate"
+                      from="0 0"
+                      to="1250 0"
+                      begin="click"
+                      dur="0.001s"
+                      fill="freeze"
+                      restart="never"
+                    />
+                    <animate attributeName="opacity" from="0" to="1" begin="click+0.8s" dur="0.8s" fill="freeze" restart="never"></animate>
+
+                    <image href="./imgs/card1/2.png" x="0" y="0" width="1080" height="1134" style="pointer-events: none"></image>
+
+                    <!-- 实际点击区域：点击后立即停用，避免重复拦截 -->
+                    <g>
+                      <set attributeName="visibility" from="visible" to="hidden" begin="click" fill="freeze" restart="never" />
+                      <rect
+                        x="0"
+                        y="0"
+                        width="1080"
+                        height="1134"
+                        fill="#3399ff"
+                        opacity="0"
+                        style="pointer-events: visible; cursor: pointer"
+                      >
+                        <animate attributeName="x" from="0" to="88888888" begin="click" dur="0.001s" fill="freeze" restart="never" />
+                      </rect>
+                    </g>
+                  </g>
+                </g>
+
+                <image href="./imgs/card1/mask.png" x="0" y="0" width="1080" height="1134" style="pointer-events: none"></image>
+              </g>
+            </g>
+          </g>
+        </g>
+      </svg>
+      <svg
+        viewBox="0 0 1080 437"
+        style="
+          display: block;
+          width: 100%;
+          margin-top: -1px;
+          background: url(./imgs/title2.png) 0 0 / 100% 100% no-repeat;
+          pointer-events: none;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
+        "
+      ></svg>
+      <!-- Card 2：点击后水层向下移出，揭晓图延迟淡入 -->
+      <svg
+        viewBox="0 0 1080 1135"
+        style="display: block; width: 100%; margin-top: -2px; overflow: hidden; -webkit-tap-highlight-color: transparent"
+      >
+        <image href="./imgs/card2/1.png" x="0" y="0" width="1080" height="1135" style="pointer-events: none"></image>
+
+        <!-- 水层向下移动 1250，完全退出画布 -->
+        <g style="cursor: pointer">
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            from="0 0"
+            to="0 1250"
+            begin="click"
+            dur="0.8s"
+            fill="freeze"
+            restart="never"
+          />
+
+          <image href="./imgs/card2/down.png" x="0" y="0" width="1080" height="1135" style="pointer-events: none"></image>
+
+          <!-- 提示层点击后立即向下退出 -->
+          <g>
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              from="0 0"
+              to="0 1250"
+              begin="click"
+              dur="0.001s"
+              fill="freeze"
+              restart="never"
+            />
+
+            <image href="./imgs/tip.png" x="0" y="0" width="1080" height="1135" style="pointer-events: none">
+              <animate
+                attributeName="opacity"
+                values="1;0.6;1"
+                dur="2s"
+                repeatCount="indefinite"
+                begin="0s"
+                calcMode="spline"
+                keyTimes="0;0.5;1"
+                keySplines=".42 0 .58 1;.42 0 .58 1"
+              ></animate>
+            </image>
+
+            <!-- 抵消提示层的瞬时位移 -->
+            <g>
+              <animateTransform
+                attributeName="transform"
+                type="translate"
+                from="0 0"
+                to="0 -1250"
+                begin="click"
+                dur="0.001s"
+                fill="freeze"
+                restart="never"
+              />
+
+              <!-- 反向补偿水层位移，使揭晓层始终停在原位 -->
+              <g opacity="0">
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  from="0 0"
+                  to="0 -1250"
+                  begin="click"
+                  dur="0.8s"
+                  fill="freeze"
+                  restart="never"
+                />
+                <animate attributeName="opacity" from="0" to="1" begin="click+0.8s" dur="0.8s" fill="freeze" restart="never"></animate>
+
+                <image href="./imgs/card2/2.png" x="0" y="0" width="1080" height="1135" style="pointer-events: none"></image>
+
+                <!-- 实际点击区域：点击后立即停用 -->
+                <g>
+                  <set attributeName="visibility" from="visible" to="hidden" begin="click" fill="freeze" restart="never" />
+                  <rect x="0" y="0" width="1080" height="1135" fill="#3399ff" opacity="0" style="pointer-events: visible; cursor: pointer">
+                    <animate attributeName="y" from="0" to="88888888" begin="click" dur="0.001s" fill="freeze" restart="never" />
+                  </rect>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+
+        <image href="./imgs/card2/mask.png" x="0" y="0" width="1080" height="1135" style="pointer-events: none"></image>
+      </svg>
+      <svg
+        viewBox="0 0 1080 436"
+        style="
+          display: block;
+          width: 100%;
+          margin-top: -2px;
+          background: url(./imgs/title3.png) 0 0 / 100% 100% no-repeat;
+          pointer-events: none;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
+        "
+      ></svg>
+
+      <!-- Card 3：左层向左、右层向右、上层向下散开 -->
+      <svg
+        viewBox="0 0 1080 1134"
+        style="display: block; width: 100%; margin-top: -2px; overflow: hidden; -webkit-tap-highlight-color: transparent"
+      >
+        <image href="./imgs/card3/1.png" x="0" y="0" width="1080" height="1134" style="pointer-events: none"></image>
+
+        <!-- 最底运动层：left 净位移为 (-1250, 0) -->
+        <g style="cursor: pointer">
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            from="0 0"
+            to="-1250 0"
+            begin="click"
+            dur="0.8s"
+            fill="freeze"
+            restart="never"
+          />
+          <image href="./imgs/card3/left.png" x="0" y="0" width="1080" height="1134" style="pointer-events: none"></image>
+
+          <!-- 中间运动层：叠加后 right 净位移为 (1250, 0) -->
+          <g>
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              from="0 0"
+              to="2500 0"
+              begin="click"
+              dur="0.8s"
+              fill="freeze"
+              restart="never"
+            />
+            <image href="./imgs/card3/right.png" x="0" y="0" width="1080" height="1134" style="pointer-events: none"></image>
+
+            <!-- 最上运动层：水平抵消后 down 净位移为 (0, 1250) -->
+            <g>
+              <animateTransform
+                attributeName="transform"
+                type="translate"
+                from="0 0"
+                to="-1250 1250"
+                begin="click"
+                dur="0.8s"
+                fill="freeze"
+                restart="never"
+              />
+              <image href="./imgs/card3/down.png" x="0" y="0" width="1080" height="1134" style="pointer-events: none"></image>
+
+              <!-- 提示层点击后立即向下退出 -->
+              <g>
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  from="0 0"
+                  to="0 1250"
+                  begin="click"
+                  dur="0.001s"
+                  fill="freeze"
+                  restart="never"
+                />
+
+                <image href="./imgs/tip.png" x="0" y="0" width="1080" height="1134" style="pointer-events: none">
                   <animate
                     attributeName="opacity"
                     values="1;0.6;1"
@@ -81,185 +329,164 @@
                     keyTimes="0;0.5;1"
                     keySplines=".42 0 .58 1;.42 0 .58 1"
                   ></animate>
-                  <set attributeName="visibility" from="visible" to="hidden" begin="click" fill="freeze" restart="never" />
-                  <animate attributeName="x" from="0" to="88888888" begin="click" dur="0.001s" fill="freeze" restart="never" />
-                  <rect
-                    x="0"
-                    y="0"
-                    width="1080"
-                    height="1134"
-                    fill="#3399ff"
-                    opacity="0"
-                    style="pointer-events: visible; cursor: pointer"
-                  ></rect>
                 </image>
+
+                <!-- 抵消提示层的瞬时位移 -->
+                <g>
+                  <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    from="0 0"
+                    to="0 -1250"
+                    begin="click"
+                    dur="0.001s"
+                    fill="freeze"
+                    restart="never"
+                  />
+
+                  <!-- 抵消 down 的纵向位移，使揭晓层始终停在原位 -->
+                  <g opacity="0">
+                    <animateTransform
+                      attributeName="transform"
+                      type="translate"
+                      from="0 0"
+                      to="0 -1250"
+                      begin="click"
+                      dur="0.8s"
+                      fill="freeze"
+                      restart="never"
+                    />
+                    <animate attributeName="opacity" from="0" to="1" begin="click+0.8s" dur="0.8s" fill="freeze" restart="never"></animate>
+
+                    <image href="./imgs/card3/2.png" x="0" y="0" width="1080" height="1134" style="pointer-events: none"></image>
+
+                    <!-- 实际点击区域：点击后立即停用 -->
+                    <g>
+                      <set attributeName="visibility" from="visible" to="hidden" begin="click" fill="freeze" restart="never" />
+                      <rect
+                        x="0"
+                        y="0"
+                        width="1080"
+                        height="1134"
+                        fill="#3399ff"
+                        opacity="0"
+                        style="pointer-events: visible; cursor: pointer"
+                      >
+                        <animate attributeName="y" from="0" to="88888888" begin="click" dur="0.001s" fill="freeze" restart="never" />
+                      </rect>
+                    </g>
+                  </g>
+                </g>
               </g>
             </g>
           </g>
         </g>
+
+        <image href="./imgs/card3/mask.png" x="0" y="0" width="1080" height="1134" style="pointer-events: none"></image>
       </svg>
+       <svg
+        viewBox="0 0 1080 436"
+        style="
+          display: block;
+          width: 100%;
+          margin-top: -1px;
+          background: url(./imgs/title4.png) 0 0 / 100% 100% no-repeat;
+          pointer-events: none;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
+        "
+      ></svg>
+      <!-- Card 2：点击后水层向下移出，揭晓图延迟淡入 -->
+      <svg
+        viewBox="0 0 1080 1135"
+        style="display: block; width: 100%; margin-top: -2px; overflow: hidden; -webkit-tap-highlight-color: transparent"
+      >
+        <image href="./imgs/card4/1.png" x="0" y="0" width="1080" height="1135" style="pointer-events: none"></image>
 
-    <svg
-  viewBox="0 0 1080 1134"
-  style="
-    display: block;
-    width: 100%;
-    margin-top: -1px;
-    -webkit-tap-highlight-color: transparent;
-  "
->
-  <!-- 底图：只隐藏这一张 -->
-  <image
-    id="card1-bg"
-    href="./imgs/card1/1.png"
-    x="0"
-    y="0"
-    width="1080"
-    height="1134"
-    opacity="0"
-  >
-    <animate
-      attributeName="opacity"
-      values="0;0;1"
-      keyTimes="0;0.2;1"
-      begin="card1-click.click"
-      dur="0.8s"
-      fill="freeze"
-      restart="never"
-      calcMode="spline"
-      keySplines=".42 0 .58 1;.42 0 .58 1"
-    ></animate>
-  </image>
-
-  <!-- 左侧内容整体左移 -->
-  <g style="cursor: pointer">
-    <animateTransform
-      attributeName="transform"
-      type="translate"
-      from="0 0"
-      to="-1250 0"
-      begin="click"
-      dur="0.8s"
-      fill="freeze"
-      restart="never"
-    ></animateTransform>
-
-    <image
-      href="./imgs/card1/left2.png"
-      x="0"
-      y="0"
-      width="1080"
-      height="1134"
-    ></image>
-
-    <image
-      href="./imgs/card1/left1.png"
-      x="0"
-      y="0"
-      width="1080"
-      height="1134"
-    ></image>
-
-    <!-- 最终向右移动 1250 -->
-    <g>
-      <animateTransform
-        attributeName="transform"
-        type="translate"
-        from="0 0"
-        to="2500 0"
-        begin="click"
-        dur="0.8s"
-        fill="freeze"
-        restart="never"
-      ></animateTransform>
-
-      <image
-        href="./imgs/card1/right.png"
-        x="0"
-        y="0"
-        width="1080"
-        height="1134"
-      ></image>
-
-      <!-- 抵消前两层位移，保持原位 -->
-      <g>
-        <animateTransform
-          attributeName="transform"
-          type="translate"
-          from="0 0"
-          to="-1250 0"
-          begin="click"
-          dur="0.8s"
-          fill="freeze"
-          restart="never"
-        ></animateTransform>
-
-        <image
-          href="./imgs/card1/mask.png"
-          x="0"
-          y="0"
-          width="1080"
-          height="1134"
-        ></image>
-
-        <image
-          href="./imgs/card1/tip.png"
-          x="0"
-          y="0"
-          width="1080"
-          height="1134"
-        >
-          <!-- 提示图呼吸动画 -->
-          <animate
-            attributeName="opacity"
-            values="1;0.6;1"
-            dur="2s"
-            repeatCount="indefinite"
-            begin="0s"
-            calcMode="spline"
-            keyTimes="0;0.5;1"
-            keySplines=".42 0 .58 1;.42 0 .58 1"
-          ></animate>
-
-          <!-- 点击后隐藏提示图 -->
-          <set
-            attributeName="visibility"
-            from="visible"
-            to="hidden"
+        <!-- 水层向下移动 1250，完全退出画布 -->
+        <g style="cursor: pointer">
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            from="0 0"
+            to="0 1250"
             begin="click"
+            dur="0.8s"
             fill="freeze"
             restart="never"
-          ></set>
+          />
 
-          <animate
-            attributeName="x"
-            from="0"
-            to="88888888"
-            begin="click"
-            dur="0.001s"
-            fill="freeze"
-            restart="never"
-          ></animate>
+          <image href="./imgs/card4/down.png" x="0" y="0" width="1080" height="1135" style="pointer-events: none"></image>
 
-          <!-- 实际点击区域 -->
-          <rect
-            id="card1-click"
-            x="0"
-            y="0"
-            width="1080"
-            height="1134"
-            fill="#3399ff"
-            opacity="0"
-            style="
-              pointer-events: visible;
-              cursor: pointer;
-            "
-          ></rect>
-        </image>
-      </g>
-    </g>
-  </g>
-</svg>
+          <!-- 提示层点击后立即向下退出 -->
+          <g>
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              from="0 0"
+              to="0 1250"
+              begin="click"
+              dur="0.001s"
+              fill="freeze"
+              restart="never"
+            />
+
+            <image href="./imgs/tip.png" x="0" y="0" width="1080" height="1135" style="pointer-events: none">
+              <animate
+                attributeName="opacity"
+                values="1;0.6;1"
+                dur="2s"
+                repeatCount="indefinite"
+                begin="0s"
+                calcMode="spline"
+                keyTimes="0;0.5;1"
+                keySplines=".42 0 .58 1;.42 0 .58 1"
+              ></animate>
+            </image>
+
+            <!-- 抵消提示层的瞬时位移 -->
+            <g>
+              <animateTransform
+                attributeName="transform"
+                type="translate"
+                from="0 0"
+                to="0 -1250"
+                begin="click"
+                dur="0.001s"
+                fill="freeze"
+                restart="never"
+              />
+
+              <!-- 反向补偿水层位移，使揭晓层始终停在原位 -->
+              <g opacity="0">
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  from="0 0"
+                  to="0 -1250"
+                  begin="click"
+                  dur="0.8s"
+                  fill="freeze"
+                  restart="never"
+                />
+                <animate attributeName="opacity" from="0" to="1" begin="click+0.8s" dur="0.8s" fill="freeze" restart="never"></animate>
+
+                <image href="./imgs/card4/2.png" x="0" y="0" width="1080" height="1135" style="pointer-events: none"></image>
+
+                <!-- 实际点击区域：点击后立即停用 -->
+                <g>
+                  <set attributeName="visibility" from="visible" to="hidden" begin="click" fill="freeze" restart="never" />
+                  <rect x="0" y="0" width="1080" height="1135" fill="#3399ff" opacity="0" style="pointer-events: visible; cursor: pointer">
+                    <animate attributeName="y" from="0" to="88888888" begin="click" dur="0.001s" fill="freeze" restart="never" />
+                  </rect>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+
+        <image href="./imgs/card4/mask.png" x="0" y="0" width="1080" height="1135" style="pointer-events: none"></image>
+      </svg>
     </section>
   </body>
 </html>
