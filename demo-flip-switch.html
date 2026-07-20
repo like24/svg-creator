@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<body style="margin:0; background:#000;">
+<section style="width:375px; margin:0 auto;">
+  <svg viewBox="0 0 1080 1380" style="display:block; width:100%;">
+
+    <!-- 基础图片（初始显示）：蓝色底 + "正面" 文字 -->
+    <rect x="0" y="0" width="1080" height="1380" fill="#3498db"/>
+    <text x="540" y="690" text-anchor="middle" font-size="120" fill="white" font-family="sans-serif">正面</text>
+
+    <!-- 交互区域：以 x=540 为中心翻转 -->
+    <g transform="translate(540 0)">
+      <g>
+        <!-- 点击：水平翻转 -->
+        <animateTransform
+          attributeName="transform" type="scale"
+          values="1 1;-1 1" dur="1s"
+          keyTimes="0;1" keySplines=".42,0,.58,1"
+          restart="never" fill="freeze" begin="click"/>
+
+        <!-- 补偿 translate，让内容回到原位 -->
+        <g transform="translate(-540 0)">
+
+          <!-- 镜像图片组（父级 + 镜像图片） -->
+          <g>
+            <!-- 0.5秒后：父级移动，把镜像图片带入可视区 -->
+            <animateTransform
+              calcMode="discrete"
+              attributeName="transform" type="translate"
+              values="-10000 -10000;-10000 -10000;-10000 -10000"
+              dur="1s" keyTimes="0;0.1;1"
+              fill="freeze" restart="never" begin="click+0.5s"/>
+            <!-- 镜像图片（预制，初始在可视区外） -->
+            <g transform="translate(11080 10000) scale(-1 1)">
+              <rect x="0" y="0" width="1080" height="1380" fill="#e74c3c"/>
+              <text x="540" y="690" text-anchor="middle" font-size="120" fill="white" font-family="sans-serif">反面</text>
+            </g>
+          </g>
+
+          <!-- 原始图片副本（初始隐藏） -->
+          <g>
+            <animate
+              attributeName="opacity"
+              values="0;0;0" dur="1s"
+              keyTimes="0;0.01;1"
+              fill="freeze" restart="never" begin="click+0.5s"/>
+            <rect x="0" y="0" width="1080" height="1380" fill="#3498db"/>
+            <text x="540" y="690" text-anchor="middle" font-size="120" fill="white" font-family="sans-serif">正面</text>
+          </g>
+
+          <!-- 提示呼吸灯 -->
+          <g>
+            <animate
+              attributeName="opacity"
+              values="1;0.1;1;1" dur="1.2s"
+              keyTimes="0;0.33;0.66;1"
+              repeatCount="indefinite"
+              restart="never" begin="0.5s"/>
+            <rect x="340" y="1250" width="400" height="80" rx="40" fill="rgba(255,255,255,0.9)"/>
+            <text x="540" y="1305" text-anchor="middle" font-size="48" fill="#333" font-family="sans-serif">点击翻转</text>
+          </g>
+
+          <!-- 一次性点击区域 -->
+          <g>
+            <set attributeName="visibility" from="visible" to="hidden"
+                 fill="freeze" restart="never" begin="click"/>
+            <rect x="0" y="0" width="1080" height="1380"
+                  fill="#39f" opacity="0" style="pointer-events:visible">
+              <animate attributeName="x" values="88888888" dur="0.001s"
+                       fill="freeze" restart="never" begin="click"/>
+            </rect>
+          </g>
+
+        </g>
+      </g>
+    </g>
+
+  </svg>
+</section>
+</body>
+</html>

@@ -32,9 +32,9 @@
                 <set attributeName="visibility" from="visible" to="hidden" fill="freeze" restart="never"
                     begin="click+0.5s"></set>
                 <g>
-                    <set attributeName="visibility" from="visible" to="hidden" fill="freeze" restart="never"
+                    <!-- <set attributeName="visibility" from="visible" to="hidden" fill="freeze" restart="never"
                         begin="click+0.5s"></set>
-                    <animate attributeName="opacity" values="1;0;0" dur="1s" keyTimes="0;0.5;1" fill="freeze"
+                    <animate attributeName="opacity" values="1;0;0" dur="1s" keyTimes="0;0.5;1" fill="freeze" -->
                         restart="never" begin="click"></animate>
                     <rect width="1080" height="800" fill="#3498db" style="pointer-events: none;" />
                     <text x="540" y="350" text-anchor="middle" fill="#fff" font-size="72"
@@ -43,19 +43,19 @@
                         style="pointer-events: none; user-select: none;">点击下方区域展开</text>
                 </g>
                 <g>
-                    <set attributeName="visibility" from="visible" to="hidden" fill="freeze" restart="never"
+                    <!-- <set attributeName="visibility" from="visible" to="hidden" fill="freeze" restart="never" -->
                         begin="click"></set>
-                    <rect x="0" y="600" width="1080" height="200" fill="#39f" opacity="0"
+                    <rect x="0" y="600" width="1080" height="200" fill="#39f" opacity="1"
                         style="pointer-events: visible;">
-                        <animate attributeName="x" values="88888888" dur="0.001s" fill="freeze" restart="never"
+                        <!-- <animate attributeName="x" values="88888888" dur="0.001s" fill="freeze" restart="never" -->
                             begin="click"></animate>
                     </rect>
                 </g>
                 <!-- 展开提示箭头 -->
                 <g>
-                    <set attributeName="visibility" from="visible" to="hidden" fill="freeze" restart="never"
+                    <!-- <set attributeName="visibility" from="visible" to="hidden" fill="freeze" restart="never"
                         begin="click"></set>
-                    <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"
+                    <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite" -->
                         restart="never" begin="0.5s"></animate>
                     <polygon points="500,700 580,700 540,750" fill="rgba(255,255,255,0.6)"
                         style="pointer-events: none;" />

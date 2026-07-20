@@ -21,17 +21,18 @@ Use this skill for WeChat public account SVG animation work.
 - Use `width:100%` for responsive scaling.
 - Use transparent hot zones for click/touch interaction.
 - Prefer `click`, `touchstart`, `touchmove`, and `click+Ns`.
-- Prefer source-style parent-child bubbling with `begin="click"`; do not use `id + begin="xxx.click"` for core interaction unless explicitly justified.
+- All interactive state changes must be modeled with parent-child `<g>` groups, transparent hot zones, and event bubbling.
+- Do not use `id + begin="xxx.click"` or `id + begin="xxx.touchstart"` as a fallback; group-based bubbling is the only default interaction architecture.
 - Provide clear trigger affordance, visible feedback, and anti-mistouch handling for every interaction.
 - Do not default to `mouseover`, `mouseout`, or `dblclick` for mobile WeChat.
 
 ## Forbidden Syntax
 
-- Do not write `begin="someId.click"` or `begin="someId.touchstart"` as core interaction logic.
+- Do not write `begin="someId.click"` or `begin="someId.touchstart"` in publishable code.
 - Do not write `onclick=`, `ontouchstart=`, `onload=`, or any inline DOM event handler.
 - Do not write `<script>`, external `<link rel="stylesheet">`, `@import`, or external CSS files.
 - Do not write HTML tags other than `section` around or between SVG blocks, including `div`, `span`, `p`, `a`, `img`, `details`, `summary`, `style`, `button`, `canvas`, or `input`.
-- Do not rely on CSS selectors, `class=`, or `id=` for animation state or trigger logic.
+- Do not rely on CSS selectors, `class=`, or `id=` for animation state or trigger logic; use nested `<g>` state groups instead.
 - Do not write hand-made CDN URLs in development output.
 - Do not use `mouseover`, `mouseout`, `mouseenter`, `mouseleave`, or `dblclick` as the default mobile interaction.
 - Do not use `querySelector`, `getElementById`, timers, DOM mutation, canvas, or form/input logic.
@@ -57,8 +58,9 @@ Read only what is needed:
 6. Keep interactions inside SVG/SMIL.
 7. Before finishing, check that there is no JS, external CSS, fixed default canvas assumption, or hand-written CDN dependency.
 8. If source images are missing, use color-block placeholders with the correct dimensions and keep replacement simple.
-9. For nested interactions, first model the effect as nested `<g>` groups and transparent hot zones so click events bubble to ancestor animations.
-10. Check interaction quality: trigger structure, affordance, final feedback, easing choice, and anti-mistouch behavior.
+9. For nested interactions and multi-step state changes, model the effect as nested `<g>` groups and transparent hot zones so click events bubble to ancestor animations.
+10. Do not switch to `id.click`-style bridging when the state machine gets more complex; expand the `<g>` group structure instead.
+11. Check interaction quality: trigger structure, affordance, final feedback, easing choice, and anti-mistouch behavior.
 
 ## Incremental Learning Workflow
 

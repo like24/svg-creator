@@ -74,7 +74,7 @@ function createAPI(opts) {
   return new WechatAPI(tokenManager);
 }
 
-// 读取/保存当前草稿状态
+// 读取/保存当前草稿状态（按目录区分）
 function loadState() {
   const statePath = STATE_FILE;
   try {
@@ -82,13 +82,20 @@ function loadState() {
       return JSON.parse(fs.readFileSync(statePath, 'utf-8'));
     }
   } catch { /* ignore */ }
-  return {};
+  return { dirs: {} };
 }
 
-function saveState(data) {
+function saveState(dir, data) {
   const statePath = STATE_FILE;
-  const state = { ...loadState(), ...data, updated: Date.now() };
+  const state = loadState();
+  if (!state.dirs) state.dirs = {};
+  state.dirs[dir] = { ...state.dirs[dir], ...data, updated: Date.now() };
   fs.writeFileSync(statePath, JSON.stringify(state, null, 2), 'utf-8');
+}
+
+function getStateByDir(dir) {
+  const state = loadState();
+  return state.dirs && state.dirs[dir] ? state.dirs[dir] : {};
 }
 
 function addCommonOptions(cmd) {
@@ -258,7 +265,9 @@ addCommonOptions(program)
   .option('--media-id <id>', '更新已有草稿（传入 media_id）')
   .action(async (file, opts) => {
     try {
-      const state = loadState();
+      const absFile = path.resolve(file);
+      const fileDir = path.dirname(absFile);  // 获取文件所在目录
+      const state = getStateByDir(fileDir);    // 读取该目录的状态
       const permanent = await resolveMaterialType(opts, { allowTemporary: false });
 
       // 1. 上传图片，获取替换后的内容
@@ -268,7 +277,7 @@ addCommonOptions(program)
       // 2. 创建/更新草稿
       console.log('步骤 2/2: 创建草稿...');
       const api = createAPI(opts);
-      const mediaId = opts.mediaId || state.mediaId;
+      const mediaId = opts.mediaId || state.mediaId;  // 使用该目录的 mediaId
       const result = await createOrUpdateDraft(api, {
         file,
         content,
@@ -281,7 +290,7 @@ addCommonOptions(program)
 
       // 3. 生成草稿内容的 txt 文件（压缩成一行），文件名使用最终标题
       const safeTitle = result.title.replace(/[\\/:*?"<>|]/g, '').trim() || 'draft';
-      const txtFile = path.join(path.dirname(path.resolve(file)), `${safeTitle}.txt`);
+      const txtFile = path.join(fileDir, `${safeTitle}.txt`);
       // 只提取 body 标签内的内容
       const bodyMatch = content.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
       const bodyContent = bodyMatch ? bodyMatch[1] : content;
@@ -289,7 +298,7 @@ addCommonOptions(program)
       fs.writeFileSync(txtFile, compressedContent, 'utf-8');
       console.log(`草稿内容已生成: ${txtFile}`);
 
-      saveState({ mediaId: result.mediaId, file: path.resolve(file) });
+      saveState(fileDir, { mediaId: result.mediaId, file: absFile });  // 保存到该目录
 
       if (result.isNew) {
         console.log(`  草稿已创建: ${result.mediaId}`);

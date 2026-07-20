@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>茅台拿铁交互测试</title>
+  <style>
+    body { margin: 0; padding: 20px; background: #1a1a2e; color: #fff; font-family: sans-serif; }
+    .container { max-width: 400px; margin: 0 auto; }
+    .info { background: #16213e; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+    .info h3 { margin: 0 0 10px; color: #e94560; }
+    .info .step { margin: 5px 0; padding: 5px 10px; background: #0f3460; border-radius: 4px; }
+    .info .step.active { background: #e94560; }
+    svg { width: 100%; border: 1px solid #333; border-radius: 8px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="info">
+    <h3>茅台拿铁交互测试</h3>
+    <div class="step" id="step1">第1步：点击任意位置 → 轮播层消失，显示第一张卡片</div>
+    <div class="step" id="step2">第2步：点击卡片 → 卡片翻转(rotate 90°)，新图片飞入</div>
+    <div class="step" id="step3">第3步：继续点击 → 重复翻转，展示不同内容</div>
+    <div class="step" id="step4">第4步：最后一张点击后 → 底部长图展开</div>
+  </div>
+
+  <!-- 主 SVG：模拟完整的交互结构 -->
+  <svg viewBox="0 0 345 586.5" style="background:#79BFDC;">
+
+    <!-- ========== 第一阶段：自动轮播层 (z-index:200) ========== -->
+    <g>
+      <!-- 点击后整个轮播层消失 -->
+      <animate attributeName="opacity" begin="click" dur="1000s"
+        fill="freeze" keyTimes="0;0.0003;1" restart="never" values="1;0;0"/>
+
+      <!-- 背景图（固定） -->
+      <rect x="0" y="0" width="345" height="586.5" fill="#2c3e50" rx="8"/>
+      <text x="172" y="293" text-anchor="middle" fill="#ecf0f1" font-size="20" font-weight="bold">
+        茅台拿铁场景背景
+      </text>
+
+      <!-- 自动轮播的 8 张图（用不同颜色模拟） -->
+      <g>
+        <animateTransform attributeName="transform" begin="0" calcMode="discrete"
+          dur="2.4s" fill="freeze" repeatCount="indefinite" restart="always"
+          type="translate" values="0 0;-345 0;-690 0;-1035 0;-1380 0;-1725 0;-2070 0;-2415 0"/>
+
+        <!-- 8 张图横排 -->
+        <rect x="0" y="200" width="345" height="200" fill="#e74c3c" rx="4"/>
+        <text x="172" y="310" text-anchor="middle" fill="#fff" font-size="16">帧 1</text>
+
+        <rect x="345" y="200" width="345" height="200" fill="#e67e22" rx="4"/>
+        <text x="517" y="310" text-anchor="middle" fill="#fff" font-size="16">帧 2</text>
+
+        <rect x="690" y="200" width="345" height="200" fill="#f1c40f" rx="4"/>
+        <text x="862" y="310" text-anchor="middle" fill="#fff" font-size="16">帧 3</text>
+
+        <rect x="1035" y="200" width="345" height="200" fill="#2ecc71" rx="4"/>
+        <text x="1207" y="310" text-anchor="middle" fill="#fff" font-size="16">帧 4</text>
+
+        <rect x="1380" y="200" width="345" height="200" fill="#1abc9c" rx="4"/>
+        <text x="1552" y="310" text-anchor="middle" fill="#fff" font-size="16">帧 5</text>
+
+        <rect x="1725" y="200" width="345" height="200" fill="#3498db" rx="4"/>
+        <text x="1897" y="310" text-anchor="middle" fill="#fff" font-size="16">帧 6</text>
+
+        <rect x="2070" y="200" width="345" height="200" fill="#9b59b6" rx="4"/>
+        <text x="2242" y="310" text-anchor="middle" fill="#fff" font-size="16">帧 7</text>
+
+        <rect x="2415" y="200" width="345" height="200" fill="#e91e63" rx="4"/>
+        <text x="2587" y="310" text-anchor="middle" fill="#fff" font-size="16">帧 8</text>
+      </g>
+
+      <!-- 幕帘展开效果 -->
+      <g>
+        <rect x="0" y="0" width="345" height="1" fill="#1a1a2e" opacity="0.8">
+          <animate attributeName="height" begin="0" dur="3s" fill="freeze" restart="never" values="586;0"/>
+        </rect>
+      </g>
+
+      <!-- 提示文字 -->
+      <text x="172" y="550" text-anchor="middle" fill="#fff" font-size="14" opacity="0.8">
+        ← 点击任意位置开始 →
+      </text>
+    </g>
+
+    <!-- ========== 第二阶段：卡片翻转层 ========== -->
+
+    <!-- 卡片 1 -->
+    <g opacity="0">
+      <animate attributeName="opacity" begin="click" dur="1000s"
+        fill="freeze" keyTimes="0;0.0003;1" restart="never" values="0;1;1"/>
+
+      <!-- 卡片背景（底图） -->
+      <rect x="0" y="0" width="345" height="586.5" fill="#2c3e50"/>
+
+      <!-- 翻转的卡片 -->
+      <g>
+        <animateTransform attributeName="transform" begin="click+0.3s" dur="0.3s"
+          fill="freeze" restart="whenNotActive" type="rotate"
+          values="0 172.5 293;90 172.5 293"/>
+        <rect x="50" y="100" width="245" height="380" fill="#e74c3c" rx="12"/>
+        <text x="172" y="300" text-anchor="middle" fill="#fff" font-size="24" font-weight="bold">
+          卡片 1
+        </text>
+        <text x="172" y="340" text-anchor="middle" fill="#fff" font-size="14">
+          点击翻转
+        </text>
+      </g>
+
+      <!-- 新图片（飞入） -->
+      <g opacity="0">
+        <animate attributeName="opacity" begin="click+0.01s" dur="1000s"
+          fill="remove" keyTimes="0;0.0003;0.0009;1" restart="always"
+          values="0;0;1;1"/>
+        <animateTransform attributeName="transform" begin="click+0.01s" dur="1000s"
+          fill="remove" keyTimes="0;0.0003;0.00031;1" restart="always" type="translate"
+          values="0 0;0 0;-10000 0;-10000 0"/>
+        <rect x="0" y="0" width="345" height="586.5" fill="#e67e22"/>
+        <text x="172" y="280" text-anchor="middle" fill="#fff" font-size="20" font-weight="bold">
+          新内容 A
+        </text>
+        <text x="172" y="320" text-anchor="middle" fill="#fff" font-size="14">
+          从侧面飞入
+        </text>
+      </g>
+
+      <!-- Section 消失 -->
+      <animate attributeName="height" begin="click+0.6s" calcMode="discrete"
+        dur="0.0001s" fill="freeze" restart="never" to="0"/>
+    </g>
+
+    <!-- 卡片 2 -->
+    <g opacity="0">
+      <animate attributeName="opacity" begin="click" dur="1000s"
+        fill="freeze" keyTimes="0;0.0003;1" restart="never" values="0;1;1"/>
+
+      <rect x="0" y="0" width="345" height="586.5" fill="#2c3e50"/>
+
+      <g>
+        <animateTransform attributeName="transform" begin="click+0.3s" dur="0.3s"
+          fill="freeze" restart="whenNotActive" type="rotate"
+          values="0 172.5 293;90 172.5 293"/>
+        <rect x="50" y="100" width="245" height="380" fill="#3498db" rx="12"/>
+        <text x="172" y="300" text-anchor="middle" fill="#fff" font-size="24" font-weight="bold">
+          卡片 2
+        </text>
+        <text x="172" y="340" text-anchor="middle" fill="#fff" font-size="14">
+          点击翻转
+        </text>
+      </g>
+
+      <g opacity="0">
+        <animate attributeName="opacity" begin="click+0.01s" dur="1000s"
+          fill="remove" keyTimes="0;0.0003;0.0009;1" restart="always"
+          values="0;0;1;1"/>
+        <animateTransform attributeName="transform" begin="click+0.01s" dur="1000s"
+          fill="remove" keyTimes="0;0.0003;0.00031;1" restart="always" type="translate"
+          values="0 0;0 0;-10000 0;-10000 0"/>
+        <rect x="0" y="0" width="345" height="586.5" fill="#2ecc71"/>
+        <text x="172" y="280" text-anchor="middle" fill="#fff" font-size="20" font-weight="bold">
+          新内容 B
+        </text>
+        <text x="172" y="320" text-anchor="middle" fill="#fff" font-size="14">
+          从侧面飞入
+        </text>
+      </g>
+
+      <animate attributeName="height" begin="click+0.6s" calcMode="discrete"
+        dur="0.0001s" fill="freeze" restart="never" to="0"/>
+    </g>
+
+    <!-- 卡片 3 -->
+    <g opacity="0">
+      <animate attributeName="opacity" begin="click" dur="1000s"
+        fill="freeze" keyTimes="0;0.0003;1" restart="never" values="0;1;1"/>
+
+      <rect x="0" y="0" width="345" height="586.5" fill="#2c3e50"/>
+
+      <g>
+        <animateTransform attributeName="transform" begin="click+0.3s" dur="0.3s"
+          fill="freeze" restart="whenNotActive" type="rotate"
+          values="0 172.5 293;90 172.5 293"/>
+        <rect x="50" y="100" width="245" height="380" fill="#9b59b6" rx="12"/>
+        <text x="172" y="300" text-anchor="middle" fill="#fff" font-size="24" font-weight="bold">
+          卡片 3
+        </text>
+        <text x="172" y="340" text-anchor="middle" fill="#fff" font-size="14">
+          点击翻转
+        </text>
+      </g>
+
+      <g opacity="0">
+        <animate attributeName="opacity" begin="click+0.01s" dur="1000s"
+          fill="remove" keyTimes="0;0.0003;0.0009;1" restart="always"
+          values="0;0;1;1"/>
+        <animateTransform attributeName="transform" begin="click+0.01s" dur="1000s"
+          fill="remove" keyTimes="0;0.0003;0.00031;1" restart="always" type="translate"
+          values="0 0;0 0;-10000 0;-10000 0"/>
+        <rect x="0" y="0" width="345" height="586.5" fill="#e91e63"/>
+        <text x="172" y="280" text-anchor="middle" fill="#fff" font-size="20" font-weight="bold">
+          新内容 C
+        </text>
+        <text x="172" y="320" text-anchor="middle" fill="#fff" font-size="14">
+          从侧面飞入
+        </text>
+      </g>
+
+      <animate attributeName="height" begin="click+0.6s" calcMode="discrete"
+        dur="0.0001s" fill="freeze" restart="never" to="0"/>
+    </g>
+
+    <!-- ========== 最后阶段：长图展开 ========== -->
+    <g opacity="0">
+      <animate attributeName="opacity" begin="click" dur="1000s"
+        fill="freeze" keyTimes="0;0.0005;1" restart="never" values="0;1;1"/>
+      <rect x="0" y="0" width="345" height="586.5" fill="#0f3460"/>
+      <text x="172" y="200" text-anchor="middle" fill="#e94560" font-size="24" font-weight="bold">
+        长图展开
+      </text>
+      <text x="172" y="250" text-anchor="middle" fill="#fff" font-size="16">
+        高度从 500 → 5000
+      </text>
+      <text x="172" y="300" text-anchor="middle" fill="#fff" font-size="14" opacity="0.7">
+        (此处模拟展开效果)
+      </text>
+    </g>
+  </svg>
+</div>
+</body>
+</html>

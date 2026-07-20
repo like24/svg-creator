@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <section
+      data-name="最外层的容器"
+      style="
+        overflow: hidden;
+        font-size: 0;
+        line-height: 0;
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        background-color: rebeccapurple;
+      "
+    >
+      <section style="height: 0; opacity: 0">
+        <section style="transform: scale(40); transform-origin: 93% 76%; pointer-events: painted; opacity: 0">
+          <section nodeleaf="">
+            <mp-common-mpaudio
+              src="/cgi-bin/readtemplate?t=tmpl/audio_tmpl&amp;name=%E6%B3%95%E8%AF%AD%E9%9F%B3%E9%A2%91&amp;play_length=1分钟"
+              cover="https://wx.qlogo.cn/mmopen/0wRpPfN90ibDGDlt6crWrhpFEoBb2GRbgjrKRsaXlrk40vBW9vO3Q7tGA27iaMMgcMTQq0d9pWMwnE8iaLjubR9KfkhSt4SIjUWeFVqHv2Z7DMKJia9s3xna9Uu9xamOwwvK/0"
+              author="BIBO科技测试号"
+              isaac2="1"
+              low_size="131.2"
+              source_size="131.2"
+              high_size="586.37"
+              name="法语音频"
+              play_length="01:15"
+              duration="75"
+              show-listen-later="1"
+              err_tips=""
+              data-trans_state="1"
+              data-verify_state="3"
+              data-topic_id=""
+              data-topic_name=""
+              voice_encode_fileid="MzkyMjUwMDk0Ml8xMDAwMDE1OTM="
+              data-is-selected="0"
+              class="mp_common_widget"
+            ></mp-common-mpaudio>
+          </section>
+        </section>
+      </section>
+      <section style="height: 0">
+        <svg
+          viewBox="0 0 1080 609"
+          style="
+            display: block;
+            width: 100%;
+            margin-top: -1px;
+
+            pointer-events: none;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+          "
+        ></svg>
+      </section>
+      <svg
+        viewBox="0 0 1080 609"
+        style="
+          transform: scale(1);
+          display: block;
+          width: 100%;
+          pointer-events: none;
+          -webkit-user-select: none;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
+        "
+      >
+        <g>
+          <animateTransform
+            calcMode="linear"
+            attributeName="transform"
+            type="translate"
+            values="0 0;0 -411;"
+            dur="10s"
+            fill="freeze"
+            begin="touchstart"
+          ></animateTransform>
+          <image x="0" y="0" width="1080" height="1020" href="./audio/fayu.png"></image>
+
+          <g>
+            <animateTransform
+              calcMode="linear"
+              attributeName="transform"
+              type="translate"
+              values="0 0;0 411;"
+              dur="10s"
+              fill="freeze"
+              begin="touchstart"
+            ></animateTransform>
+            <g>
+              <image x="0" y="0" width="1080" height="609" href="./audio/audio-bg-pause.png"></image>
+              <image x="700" y="500" width="300" height="100" href="./audio/audio.gif"></image>
+              <g>
+                <animate attributeName="opacity" values="1;1;0;0" dur="0.001s" fill="freeze" begin="touchstart"></animate>
+                <image x="0" y="0" width="1080" height="609" href="./audio/audio-bg-play.png"></image>
+                <g>
+                  <animateTransform
+                    calcMode="discrete"
+                    attributeName="transform"
+                    type="translate"
+                    values="-20000 0;-20000 0;-20000 0"
+                    dur="0.001s"
+                    keyTimes="0;0.00001;1"
+                    fill="freeze"
+                    begin="mousedown;touchstart"
+                  ></animateTransform>
+                  <animateTransform
+                    calcMode="discrete"
+                    attributeName="transform"
+                    type="translate"
+                    values="0 0;0 0;0 0"
+                    dur="0.001s"
+                    keyTimes="0;0.00001;1"
+                    fill="freeze"
+                    begin="touchmove"
+                  ></animateTransform>
+                  <rect x="0" y="0" width="1080" height="609" fill="#39f" opacity="0" style="pointer-events: visible"></rect>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </section>
+  </body>
+</html>

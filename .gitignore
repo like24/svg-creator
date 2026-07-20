@@ -15,3 +15,6 @@ node_modules/
 packages/.wechat-cdn-cache.json
 packages/.wechat-cdn-state.json
 packages/.wechat-cdn-token.json
+
+# Text files
+*.txt

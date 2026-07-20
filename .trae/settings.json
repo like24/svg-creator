@@ -1,0 +1,31 @@
+{
+  // 全局开启保存自动格式化
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  // HTML文件（包含页面内嵌svg）指定Prettier为默认格式化器
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  // Vue模板内的<svg>标签格式化
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  // React/TSX内联SVG
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  // HTML内部标签深度缩进，svg自动换行对齐
+  "html.format.indentInnerHtml": true,
+  "html.format.enable": false,
+  // 保存自动修复代码规范
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  }
+}
