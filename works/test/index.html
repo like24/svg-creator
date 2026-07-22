@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>svg gif延迟加载测试</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <section
+      data-name="最外层的容器"
+      style="
+        overflow: hidden;
+        font-size: 0px;
+        line-height: 0;
+        pointer-events: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        visibility: visible;
+      "
+    >
+    <svg viewBox="0 0 1080 3000"></svg>
+    <svg viewBox="0 0 1080 2000">
+       
+        <g transform="translate(0, 1500)">
+            <svg viewBox="0 0 1080 502">
+                <image href="./imgs/1.gif" x="0" y="0" width="1080" height="502"></image>
+            </svg>
+        </g>
+    </svg>
+    <svg viewBox="0 0 1080 2000">
+        <rect fill="#ccc" x="0" y="0" width="1080" height="2000"></rect>
+        <foreignObject x="0" y="1500" width="1080" height="1000">
+            <svg viewBox="0 0 1080 502">
+                <image href="./imgs/1.gif" x="0" y="0" width="1080" height="502"></image>
+            </svg>
+        </foreignObject>
+    </svg>
+</section>
+  </body>
+</html>
