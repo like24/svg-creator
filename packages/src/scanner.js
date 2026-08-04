@@ -12,6 +12,19 @@ const SVG_IMAGE_RE = /<image[^>]+href="((?!(?:(?:https?:)?\/\/|data:))[^"]+)"/gi
 // <img src="...">
 const HTML_IMG_RE = /<img[^>]+src="((?!(?:(?:https?:)?\/\/|data:))[^"]+)"/gi;
 
+// 微信图片 CDN。除了标准 https:// 链接，也兼容 //host/path 和
+// 运营代码里偶尔出现的无协议 host/path 写法。
+const WECHAT_IMAGE_URL_RE = /^(?:(?:https?:)?\/\/)?(?:(?:mmbiz|mmecoa)\.qpic\.cn|(?:wx|mmbiz)\.qlogo\.cn)(?:[\/:?#]|$)/i;
+
+function isWechatImageUrl(value) {
+  if (!value) return false;
+  const normalized = value
+    .trim()
+    .replace(/^&quot;|&quot;$/gi, '')
+    .replace(/^["']|["']$/g, '');
+  return WECHAT_IMAGE_URL_RE.test(normalized);
+}
+
 function scanFile(htmlContent) {
   const refs = [];
   const seen = new Set();
@@ -21,6 +34,7 @@ function scanFile(htmlContent) {
   CSS_URL_RE.lastIndex = 0;
   while ((match = CSS_URL_RE.exec(htmlContent)) !== null) {
     const localPath = match[1].trim();
+    if (isWechatImageUrl(localPath)) continue;
     if (!seen.has(localPath)) {
       seen.add(localPath);
       refs.push({ localPath, context: 'css-bg' });
@@ -31,6 +45,7 @@ function scanFile(htmlContent) {
   SVG_IMAGE_RE.lastIndex = 0;
   while ((match = SVG_IMAGE_RE.exec(htmlContent)) !== null) {
     const localPath = match[1].trim();
+    if (isWechatImageUrl(localPath)) continue;
     if (!seen.has(localPath)) {
       seen.add(localPath);
       refs.push({ localPath, context: 'svg-image' });
@@ -41,6 +56,7 @@ function scanFile(htmlContent) {
   HTML_IMG_RE.lastIndex = 0;
   while ((match = HTML_IMG_RE.exec(htmlContent)) !== null) {
     const localPath = match[1].trim();
+    if (isWechatImageUrl(localPath)) continue;
     if (!seen.has(localPath)) {
       seen.add(localPath);
       refs.push({ localPath, context: 'html-img' });
@@ -55,4 +71,12 @@ function resolveImagePath(htmlFilePath, localImagePath) {
   return path.resolve(htmlDir, localImagePath);
 }
 
-module.exports = { scanFile, resolveImagePath, CSS_URL_RE, SVG_IMAGE_RE, HTML_IMG_RE };
+module.exports = {
+  scanFile,
+  resolveImagePath,
+  isWechatImageUrl,
+  WECHAT_IMAGE_URL_RE,
+  CSS_URL_RE,
+  SVG_IMAGE_RE,
+  HTML_IMG_RE,
+};
